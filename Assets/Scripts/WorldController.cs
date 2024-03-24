@@ -20,6 +20,11 @@ public class WorldController : MonoBehaviour
         }
     }
 
+    private void SpawnDrone()
+    {
+        
+    }
+
     private void FixedUpdate()
     {   
         updateWorldOriginIfNeeded(droneController.latLonAlt.y, droneController.latLonAlt.x, droneController.latLonAlt.z);

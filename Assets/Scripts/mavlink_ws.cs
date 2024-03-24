@@ -19,13 +19,13 @@ public class MavlinkWS : MonoBehaviour
 
 
     /// <summary>
-    /// Initiates connection to the server at the specified URL, requesting both LOCAL_POSITION_NED and ATTITUDE messages.
+    /// Initiates connection to the mavlink2rest server at the specified URL
     /// </summary>
     /// <param name="url">The URL to connect to, excluding protocol and endpoint specifics.</param>
     public async void Connect(string url)
     {
         Debug.Log($"Connecting to {url}");
-        websocket = new WebSocket($"ws://{url}/ws/mavlink?filter=LOCAL_POSITION_NED|ATTITUDE|GLOBAL_POSITION_INT");
+        websocket = new WebSocket($"ws://{url}/ws/mavlink?filter=HEARTBEAT|ATTITUDE|GLOBAL_POSITION_INT");
 
         websocket.OnOpen += () => Debug.Log("Connection open!");
         websocket.OnError += (e) => Debug.Log($"Error! {e}");
@@ -42,7 +42,7 @@ public class MavlinkWS : MonoBehaviour
     private void ProcessMessage(byte[] bytes)
     {
         var message = System.Text.Encoding.UTF8.GetString(bytes);
-        mavlinkMessageProcessor.ProcessesMessage(message);
+        mavlinkMessageProcessor.ProcessMessage(message);
     }
 
     private async void OnApplicationQuit()

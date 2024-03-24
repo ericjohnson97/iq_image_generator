@@ -7,9 +7,9 @@ public class MavlinkMessages : MonoBehaviour
     [Serializable]
     public class Header
     {
-        public int componentId;
+        public int component_id;
         public int sequence;
-        public int systemId;
+        public int system_id;
     }
 
     //  LOCAL_POSITION_NED
@@ -73,6 +73,50 @@ public class MavlinkMessages : MonoBehaviour
         public int vy;
         public int vz;
         public int hdg;
+    }
+
+    // HEARTBEAT
+    [Serializable]
+    public class Heartbeat
+    {
+        public Header header;
+        public HeartbeatMessage message;
+    }
+
+    [Serializable]
+    public class HeartbeatMessage
+    {
+        public Autopilot autopilot;
+        public BaseMode base_mode;
+        public int custom_mode;
+        public int mavlink_version;
+        public Mavtype mavtype;
+        public SystemStatus system_status;
+        public string type;
+    }
+
+    [Serializable]
+    public class Autopilot
+    {
+        public string type;
+    }
+
+    [Serializable]
+    public class BaseMode
+    {
+        public int bits;
+    }
+
+    [Serializable]
+    public class Mavtype
+    {
+        public string type;
+    }
+
+    [Serializable]
+    public class SystemStatus
+    {
+        public string type;
     }
 
 }

@@ -1,37 +1,45 @@
 using System;
 using UnityEngine;
 
-
 public class MavlinkMessageProcessor : MonoBehaviour
 {
-    
+    // Arrays to hold the data for each system ID
+    public MavlinkMessages.Attitude[] attitudeArray = new MavlinkMessages.Attitude[256];
+    public MavlinkMessages.GlobalPositionInt[] globalPositionIntArray = new MavlinkMessages.GlobalPositionInt[256];
+    public MavlinkMessages.Heartbeat[] heartbeatArray = new MavlinkMessages.Heartbeat[256];
 
-    public MavlinkMessages.LocalPositionNed localPosNed = new MavlinkMessages.LocalPositionNed();
-    public MavlinkMessages.Attitude attitude = new MavlinkMessages.Attitude();
-    public MavlinkMessages.GlobalPositionInt globalPositionInt = new MavlinkMessages.GlobalPositionInt();
-
-    public void ProcessesMessage(string message)
+    public MavlinkMessageProcessor()
     {
-        if (message.Contains("LOCAL_POSITION_NED"))
+        // Initialize arrays
+        for (int i = 0; i < 256; i++)
         {
-            localPosNed = JsonUtility.FromJson<MavlinkMessages.LocalPositionNed>(message);
+            attitudeArray[i] = new MavlinkMessages.Attitude(); 
+            globalPositionIntArray[i] = new MavlinkMessages.GlobalPositionInt(); 
         }
-        else if (message.Contains("ATTITUDE"))
+    }
+
+    public void ProcessMessage(string message)
+    {
+        int systemId = 0; 
+
+        if (message.Contains("ATTITUDE"))
         {
-            attitude = JsonUtility.FromJson<MavlinkMessages.Attitude>(message);
+            var newAttitude = JsonUtility.FromJson<MavlinkMessages.Attitude>(message);
+            systemId = newAttitude.header.system_id; 
+            attitudeArray[systemId] = newAttitude;
         }
         else if (message.Contains("GLOBAL_POSITION_INT"))
         {
-            globalPositionInt = JsonUtility.FromJson<MavlinkMessages.GlobalPositionInt>(message);
-            // nedPos = ConvertGeoToUnityCoordinates( globalPositionInt.message.lon / 1e7f, globalPositionInt.message.lat / 1e7f, globalPositionInt.message.alt / 1e3f);
-            // var newLongitude = globalPositionInt.message.lon / 1e7;
-            // var newLatitude = globalPositionInt.message.lat / 1e7;
-            // var newAltitude = globalPositionInt.message.alt / 1e3;
-
-            // // Check and update world origin if needed
-            // UpdateWorldOriginIfNeeded(newLongitude, newLatitude, newAltitude);
-            // georeference.SetOriginLongitudeLatitudeHeight(globalPositionInt.message.lat / 1e7f, globalPositionInt.message.alt / 1e3f, globalPositionInt.message.lon / 1e7f);
+            var newGlobalPositionInt = JsonUtility.FromJson<MavlinkMessages.GlobalPositionInt>(message);
+            systemId = newGlobalPositionInt.header.system_id; 
+            globalPositionIntArray[systemId] = newGlobalPositionInt;
+        }
+        else if (message.Contains("HEARTBEAT"))
+        {
+            var newHeartbeat = JsonUtility.FromJson<MavlinkMessages.Heartbeat>(message);
+            systemId = newHeartbeat.header.system_id; 
+            heartbeatArray[systemId] = newHeartbeat;
+            Debug.Log("aircraft type is " + newHeartbeat.message.mavtype.type + " for system id " + systemId);
         }
     }
 }
-
