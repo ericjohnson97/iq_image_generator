@@ -3,6 +3,7 @@
 Over the years I have noticed it difficult to simulate camera streams on simulated drones at geo-specific locations. In addition, existing options for geo-specific image generation are tied to simulators. This project aims to only handle the image generation portion of drone simulation. Because of this, the project is extensible, distributable and usable with any existing PX4 or Ardupilot drone simulator. 
 
 ![promo pic](imgs/promo.PNG)
+![multi vehicle](imgs/multi-vehicle.PNG)
 
 ## What is an Image Generator?
 
