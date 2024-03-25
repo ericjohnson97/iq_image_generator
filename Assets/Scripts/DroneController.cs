@@ -44,33 +44,46 @@ public class DroneController : MonoBehaviour
     }
 
     // TODO: make the dynamic loading of the aircraft mesh better
-    private void UpdateAicraftType()
+   private void UpdateAircraftType()
     {
-
         if (mavlinkMessageProcessor.heartbeatArray[systemId].message.mavtype.type == aircraftType)
         {
             return;
         }
-        aircraftType = mavlinkMessageProcessor.heartbeatArray[systemId].message.mavtype.type;
 
+        aircraftType = mavlinkMessageProcessor.heartbeatArray[systemId].message.mavtype.type;
         Debug.Log("Aircraft type: " + aircraftType);
 
-        // show the right mesh 
+        // Assuming 'drone' is already assigned via the inspector or elsewhere in your code
+        // If 'drone' could be unassigned, add a check here
+
+        // Show the right mesh
+        Transform planeTransform = drone.transform.Find("plane");
+        Transform copterTransform = drone.transform.Find("copter");
+
+        if (planeTransform == null || copterTransform == null)
+        {
+            Debug.LogError("One of the required GameObjects (plane or copter) is missing in the children of " + drone.name);
+            return;
+        }
+
         if (mavlinkMessageProcessor.heartbeatArray[systemId].message.mavtype.type == "MAV_TYPE_FIXED_WING")
         {
-            GameObject.Find("plane").SetActive(true);
-            GameObject.Find("copter").SetActive(false);
-        }   
+            planeTransform.gameObject.SetActive(true);
+            copterTransform.gameObject.SetActive(false);
+        }
         else if (mavlinkMessageProcessor.heartbeatArray[systemId].message.mavtype.type == "MAV_TYPE_QUADROTOR")
         {
-            GameObject.Find("copter").SetActive(true);
-            GameObject.Find("plane").SetActive(false);
+            copterTransform.gameObject.SetActive(true);
+            planeTransform.gameObject.SetActive(false);
         }
     }
 
+
+
     private void FixedUpdate()
     {
-        UpdateAicraftType();
+        UpdateAircraftType();
         updatellaPos();
         calculateNedPos();
 
