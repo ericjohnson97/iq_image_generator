@@ -2,6 +2,8 @@
 
 Over the years I have noticed it difficult to simulate camera streams on simulated drones at geo-specific locations. In addition, existing options for geo-specific image generation are tied to simulators. This project aims to only handle the image generation portion of drone simulation. Because of this, the project is extensible, distributable and usable with any existing PX4 or Ardupilot drone simulator. 
 
+![promo pic](imgs/promo.PNG)
+
 ## What is an Image Generator?
 
 An image generator is a application that can perform rendering of perspectives in distributed simulations. This is a common approach in professional aerospace flight simulators. For example in a large projector flight simulator room, the resolution of the view may be too high for a single computer to render. In this case, image generators are deployed to multiple computers which are in charge of rendering portions of the view.
