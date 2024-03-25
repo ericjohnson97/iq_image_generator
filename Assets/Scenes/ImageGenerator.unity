@@ -168,6 +168,7 @@ GameObject:
   - component: {fileID: 110319845}
   - component: {fileID: 110319846}
   - component: {fileID: 110319847}
+  - component: {fileID: 110319848}
   m_Layer: 0
   m_Name: IGcontroller
   m_TagString: Untagged
@@ -11003,7 +11004,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mavlinkMessageProcessor: {fileID: 110319845}
-  connectionUrl: 192.168.1.222:6040
+  connectionUrl: wss://sim.intelligentquads.com/a3b071a8a9a54467a2d8a8406c7f3fbb
+--- !u!114 &110319848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110319842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 419e949239c9fd3459a2a470b8bc2181, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileset: {fileID: 1814485189}
+  mavlinkWS: {fileID: 110319847}
 --- !u!1 &134658867
 GameObject:
   m_ObjectHideFlags: 0
@@ -11589,7 +11604,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _showCreditsOnScreen: 1
   _tilesetSource: 1
-  _url: https://tile.googleapis.com/v1/3dtiles/root.json?key=AIzaSyBd4TleX93uaK5TbakPYjFqhhX0_ut3YI4
+  _url: 
   _ionAssetID: 0
   _ionAccessToken: 
   _ionServer: {fileID: 11400000, guid: 814bf690df9afa843aec185d2975c51f, type: 2}
@@ -11597,11 +11612,11 @@ MonoBehaviour:
   _preloadAncestors: 1
   _preloadSiblings: 1
   _forbidHoles: 1
-  _maximumSimultaneousTileLoads: 1000000
-  _maximumCachedBytes: 10368709120
+  _maximumSimultaneousTileLoads: 10000000
+  _maximumCachedBytes: 15368709120
   _loadingDescendantLimit: 20
   _enableFrustumCulling: 0
-  _enableFogCulling: 0
+  _enableFogCulling: 1
   _enforceCulledScreenSpaceError: 1
   _culledScreenSpaceError: 8
   _opaqueMaterial: {fileID: 0}

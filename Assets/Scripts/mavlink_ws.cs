@@ -25,7 +25,7 @@ public class MavlinkWS : MonoBehaviour
     public async void Connect(string url)
     {
         Debug.Log($"Connecting to {url}");
-        websocket = new WebSocket($"ws://{url}/ws/mavlink?filter=HEARTBEAT|ATTITUDE|GLOBAL_POSITION_INT");
+        websocket = new WebSocket($"{url}/ws/mavlink?filter=HEARTBEAT|ATTITUDE|GLOBAL_POSITION_INT");
 
         websocket.OnOpen += () => Debug.Log("Connection open!");
         websocket.OnError += (e) => Debug.Log($"Error! {e}");
@@ -53,13 +53,13 @@ public class MavlinkWS : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Starts the WebSocket connection and initializes component state.
-    /// </summary>
-    private void Start()
-    {
-        Connect(connectionUrl);
-    }
+    // /// <summary>
+    // /// Starts the WebSocket connection and initializes component state.
+    // /// </summary>
+    // private void Start()
+    // {
+    //     Connect(connectionUrl);
+    // }
 
     /// <summary>
     /// Handles message dispatch for the WebSocket connection, ensuring messages are processed.

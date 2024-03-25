@@ -72,3 +72,5 @@ crashlytics-build.properties
 
 Logs
 .venv
+/[Aa]ssets/[Ss]treamingAssets/config.json
+/[Aa]ssets/[Ss]treamingAssets/config.json.meta

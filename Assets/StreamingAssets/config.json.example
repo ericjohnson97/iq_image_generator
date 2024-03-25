@@ -1,0 +1,5 @@
+{
+    "tileURL": "https://tile.googleapis.com/v1/3dtiles/root.json?key=<YOUR_API_KEY>",
+    "mavlink2RestURL" : "ws://127.0.0.1:6040"
+}
+  

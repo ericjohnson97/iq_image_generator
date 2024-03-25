@@ -39,7 +39,6 @@ public class MavlinkMessageProcessor : MonoBehaviour
             var newHeartbeat = JsonUtility.FromJson<MavlinkMessages.Heartbeat>(message);
             systemId = newHeartbeat.header.system_id; 
             heartbeatArray[systemId] = newHeartbeat;
-            Debug.Log("aircraft type is " + newHeartbeat.message.mavtype.type + " for system id " + systemId);
         }
     }
 }
