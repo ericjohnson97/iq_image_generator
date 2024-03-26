@@ -1,5 +1,29 @@
 {
     "tileURL": "https://tile.googleapis.com/v1/3dtiles/root.json?key=<YOUR_API_KEY>",
-    "mavlink2RestURL" : "ws://127.0.0.1:6040"
+    "mavlink2RestURL" : "ws://127.0.0.1:6040",
+    "vehicles" : [
+        {
+            "id" : 1,
+            "cameras" : [
+                {
+                    "position" : [0, 0, 0],
+                    "orientation" : [0, 0, 0],
+                    "encoding" : "H264Nvidia",
+                    "destination" : "udp://192.168.1.255:5600"
+                }
+            ]
+        },
+        {
+            "id" : 2,
+            "cameras" : [
+                {
+                    "position" : [0, 0, 0],
+                    "orientation" : [0, 0, 90],
+                    "encoding" : "H264Nvidia",
+                    "destination" : "udp://192.168.1.255:5601"
+                }
+            ]
+        }
+    ]
 }
   
