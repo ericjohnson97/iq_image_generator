@@ -28,7 +28,7 @@ This project leverages Cesium for unity to bring geo-specific 3d map tiles into 
 
 - [x] Use 3d Map tiles to be able to have 3d image generation from any where in the world
 - [x] generate udp h264 video streams from unity cameras
-- [ ] support multiple aircraft
+- [x] support multiple aircraft
 - [ ] create configuration file system to be able to configure
     - [ ] number of cameras
     - [ ] camera settings
