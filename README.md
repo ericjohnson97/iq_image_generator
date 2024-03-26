@@ -44,6 +44,17 @@ This project leverages Cesium for unity to bring geo-specific 3d map tiles into 
 - [ ] Some amount of world customization
 
 
+## Using the Image Generator
+
+- generate a maps API key from google. follow this [tutorial](https://youtu.be/u6wW5ZIIrpc?si=m64pGFGyKjVAmcvR&t=100) 
+- Download the latest release from the [releases page](https://github.com/ericjohnson97/iq_image_generator/releases)
+- unzip the release
+- copy the file `config.json.example` to `config.json`
+- configure the `config.json` file in the `Intelligent Quads Image Generator_Data/StreamingAssets` folder
+    - set the `"tileURL"`:  to `https://tile.googleapis.com/v1/3dtiles/root.json?key=<your google maps api key>`
+    - set the `"mavlink2RestURL"` to a mavlink2rest server. if using inteligentquads.com as the sim backend set it to `"wss://sim.intelligentquads.com/<uuid>"`
+
+
 ## FAQ
 
 ### Are you planning on making this image generator CIGI compliant?
