@@ -5,7 +5,7 @@ namespace FFmpegOut.LiveStream
     public class StreamCameraCapture : CameraCapture
     {
         [SerializeField] protected StreamPreset _streamPreset;
-        [SerializeField] protected string _streamAddress;
+        [SerializeField] public string streamAddress;
 
         protected override FFmpegSession GetSession(int texWidth, int texHeight)
         {
@@ -15,7 +15,7 @@ namespace FFmpegOut.LiveStream
                 frameRate,
                 preset,
                 _streamPreset,
-                _streamAddress);
+                streamAddress);
         }
     }
 }

@@ -46,11 +46,24 @@ public class DroneController : MonoBehaviour
     // TODO: make the dynamic loading of the aircraft mesh better
    private void UpdateAircraftType()
     {
+       // Check if mavlinkMessageProcessor or heartbeatArray[systemId] is null
+        if (mavlinkMessageProcessor == null || mavlinkMessageProcessor.heartbeatArray[systemId] == null)
+        {
+            Debug.Log("mavlinkMessageProcessor or heartbeatArray[systemId] is null");
+            return;
+        }
+
+        // Check if nested properties are null
+        if (mavlinkMessageProcessor.heartbeatArray[systemId].message == null || mavlinkMessageProcessor.heartbeatArray[systemId].message.mavtype == null)
+        {
+            Debug.Log("Message or mavtype is null for systemId: " + systemId);
+            return;
+        }
+        // return if the aircraft type is already set
         if (mavlinkMessageProcessor.heartbeatArray[systemId].message.mavtype.type == aircraftType)
         {
             return;
         }
-
         aircraftType = mavlinkMessageProcessor.heartbeatArray[systemId].message.mavtype.type;
         Debug.Log("Aircraft type: " + aircraftType);
 
@@ -84,6 +97,13 @@ public class DroneController : MonoBehaviour
     private void FixedUpdate()
     {
         UpdateAircraftType();
+        // check that globalPositionIntArray[systemId] is not null and attituteArray[systemId] is not null
+        if (mavlinkMessageProcessor.globalPositionIntArray[systemId].message == null || mavlinkMessageProcessor.attitudeArray[systemId] == null)
+        {
+            Debug.Log("globalPositionIntArray[systemId] or attituteArray[systemId] is null");
+            return;
+        }
+
         updatellaPos();
         calculateNedPos();
 

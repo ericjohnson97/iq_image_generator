@@ -8,15 +8,21 @@ public class MavlinkMessageProcessor : MonoBehaviour
     public MavlinkMessages.GlobalPositionInt[] globalPositionIntArray = new MavlinkMessages.GlobalPositionInt[256];
     public MavlinkMessages.Heartbeat[] heartbeatArray = new MavlinkMessages.Heartbeat[256];
 
-    public MavlinkMessageProcessor()
+    public WorldController worldController;
+
+    public void Start()
     {
-        // Initialize arrays
         for (int i = 0; i < 256; i++)
         {
-            attitudeArray[i] = new MavlinkMessages.Attitude(); 
-            globalPositionIntArray[i] = new MavlinkMessages.GlobalPositionInt(); 
+            attitudeArray[i] = new MavlinkMessages.Attitude();
+            globalPositionIntArray[i] = new MavlinkMessages.GlobalPositionInt();
+            heartbeatArray[i] = new MavlinkMessages.Heartbeat();
+            heartbeatArray[i].header = new MavlinkMessages.Header();
+
+            heartbeatArray[i].header.system_id = -1;
         }
     }
+
 
     public void ProcessMessage(string message)
     {
@@ -37,7 +43,11 @@ public class MavlinkMessageProcessor : MonoBehaviour
         else if (message.Contains("HEARTBEAT"))
         {
             var newHeartbeat = JsonUtility.FromJson<MavlinkMessages.Heartbeat>(message);
-            systemId = newHeartbeat.header.system_id; 
+            systemId = newHeartbeat.header.system_id;
+            if (heartbeatArray[systemId].header.system_id == -1)
+            {
+                worldController?.SpawnDrone(newHeartbeat); 
+            }
             heartbeatArray[systemId] = newHeartbeat;
         }
     }
