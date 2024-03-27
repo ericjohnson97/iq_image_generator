@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Unity.Mathematics;
+using System.Collections.Generic;
 public class WorldController : MonoBehaviour
 {
     public CesiumForUnity.CesiumGeoreference georeference;
@@ -11,6 +12,10 @@ public class WorldController : MonoBehaviour
     
     public MavlinkMessageProcessor mavlinkMessageProcessor;
     public double3 currentOriginECEF = new double3(0, 0, 0);
+
+    public CameraController cameraController;
+    public CameraListController cameraListController;
+
     private void updateWorldOriginIfNeeded(double newLongitude, double newLatitude, double newAltitude)
     {
         double3 newPositionECEF = CesiumForUnity.CesiumWgs84Ellipsoid.LongitudeLatitudeHeightToEarthCenteredEarthFixed(new double3(newLongitude, newLatitude, newAltitude));
@@ -59,11 +64,23 @@ public class WorldController : MonoBehaviour
             {
                 Debug.LogError("DynamicCamera component not found on the drone.");
             }
+            
+            Camera FollowCamera = newDrone.transform.Find("FollowCam").GetComponent<Camera>();
+            if (FollowCamera != null)
+            {
+                FollowCamera.enabled = true;
+                cameraController.AddCamera(FollowCamera);
+            }
+            else
+            {
+                Debug.LogError("FollowCam component not found on the drone.");
+            }
+
+
             newDrone.transform.Find("DynamicCamera").GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().streamAddress = $"udp://192.168.1.255:{5600 + heartbeat.header.system_id}";
             newDrone.transform.Find("DynamicCamera").GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().enabled = true;
 
-            
-
+            cameraListController.CreateEntry(newDrone);
 
             Debug.Log($"Spawned a new drone for system ID: {heartbeat.header.system_id}.");
             // Additional setup for newDrone as needed...
