@@ -16,6 +16,8 @@ public class WorldController : MonoBehaviour
     public CameraController cameraController;
     public CameraListController cameraListController;
 
+    public ConfigLoader configLoader;
+
     private void updateWorldOriginIfNeeded(double newLongitude, double newLatitude, double newAltitude)
     {
         double3 newPositionECEF = CesiumForUnity.CesiumWgs84Ellipsoid.LongitudeLatitudeHeightToEarthCenteredEarthFixed(new double3(newLongitude, newLatitude, newAltitude));
@@ -58,6 +60,7 @@ public class WorldController : MonoBehaviour
             Camera camera = newDrone.transform.Find("DynamicCamera").GetComponent<Camera>();
             if (camera != null)
             {
+                setUpCamera(camera, heartbeat.header.system_id);
                 camera.enabled = true;
             }
             else
@@ -76,14 +79,45 @@ public class WorldController : MonoBehaviour
                 Debug.LogError("FollowCam component not found on the drone.");
             }
 
-
-            newDrone.transform.Find("DynamicCamera").GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().streamAddress = $"udp://192.168.1.255:{5600 + heartbeat.header.system_id}";
-            newDrone.transform.Find("DynamicCamera").GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().enabled = true;
-
             cameraListController.CreateEntry(newDrone);
 
             Debug.Log($"Spawned a new drone for system ID: {heartbeat.header.system_id}.");
             // Additional setup for newDrone as needed...
+        }
+    }
+
+    private Vector3 convertNEDToUnity(float x, float y, float z)
+    {
+        return new Vector3( y, -z, x );
+    }
+
+    private Quaternion convertEulerNEDToUnity(float roll, float pitch, float yaw)
+    {
+        return Quaternion.Euler(-pitch, yaw, -roll);
+    }
+
+    public void setUpCamera(Camera camera, int systemId)
+    {
+
+        // find camera settings
+        foreach (var vehicle in configLoader.config.vehicles)
+        {
+            if (vehicle.id == systemId)
+            {
+                foreach (var cameraConfig in vehicle.cameras)
+                {
+                    // TODO fix
+                    if (cameraConfig.id == 1)
+                    {
+                        
+                        camera.transform.position = convertNEDToUnity(cameraConfig.position[0], cameraConfig.position[1], cameraConfig.position[2]);
+                        // read in euler angle orientation and convert to quaternion
+                        camera.transform.rotation = convertEulerNEDToUnity(cameraConfig.orientation[0], cameraConfig.orientation[1], cameraConfig.orientation[2]);
+                        camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().streamAddress = cameraConfig.destination;
+                        camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().enabled = true;
+                    }
+                }
+            }
         }
     }
 

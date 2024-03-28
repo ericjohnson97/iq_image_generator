@@ -10982,6 +10982,7 @@ MonoBehaviour:
     z: 0
   cameraController: {fileID: 110319850}
   cameraListController: {fileID: 1898266971}
+  configLoader: {fileID: 110319848}
 --- !u!114 &110319847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11010,6 +11011,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileset: {fileID: 1814485189}
   mavlinkWS: {fileID: 110319847}
+  config:
+    tileURL: 
+    mavlink2RestURL: 
+    vehicles: []
 --- !u!114 &110319849
 MonoBehaviour:
   m_ObjectHideFlags: 0
