@@ -56,18 +56,16 @@ public class WorldController : MonoBehaviour
             newDrone.GetComponent<DroneController>().enabled = true;
             newDrone.SetActive(true);
 
-            // Camera setup
-            Camera camera = newDrone.transform.Find("DynamicCamera").GetComponent<Camera>();
-            if (camera != null)
+            VehicleConfig vehicleConfig = findVehicleConfig(heartbeat.header.system_id);
+            if (vehicleConfig != null)
             {
-                setUpCamera(camera, heartbeat.header.system_id);
-                camera.enabled = true;
+                setUpCameras(vehicleConfig, newDrone);
             }
             else
             {
-                Debug.LogError("DynamicCamera component not found on the drone.");
+                Debug.LogError("Vehicle config not found for system ID: " + heartbeat.header.system_id);
             }
-            
+
             Camera FollowCamera = newDrone.transform.Find("FollowCam").GetComponent<Camera>();
             if (FollowCamera != null)
             {
@@ -81,8 +79,44 @@ public class WorldController : MonoBehaviour
 
             cameraListController.CreateEntry(newDrone);
 
+            if (droneController == null)
+            {
+                droneController = newDrone.GetComponent<DroneController>();
+            }
+
             Debug.Log($"Spawned a new drone for system ID: {heartbeat.header.system_id}.");
-            // Additional setup for newDrone as needed...
+        }
+    }
+
+    public VehicleConfig findVehicleConfig(int systemId)
+    {
+        foreach (var vehicleConfig in configLoader.config.vehicles)
+        {
+            if (vehicleConfig.id == systemId)
+            {
+                return vehicleConfig;
+            }
+        }
+        return null;
+    }
+
+    public void setUpCameras(VehicleConfig vehicleConfig, GameObject newDrone)
+    {
+        foreach (var cameraConfig in vehicleConfig.cameras)
+        {
+            // copy camera game object from DynamicCameraTemplate and rename it
+            GameObject camera = Instantiate(newDrone.transform.Find("DynamicCameraTemplate").gameObject, newDrone.transform);
+            camera.name = $"CameraID_{cameraConfig.id}";
+            camera.SetActive(true);
+            camera.transform.position = convertNEDToUnity(cameraConfig.position[0], cameraConfig.position[1], cameraConfig.position[2]);
+            // read in euler angle orientation and convert to quaternion
+            camera.transform.rotation = convertEulerNEDToUnity(cameraConfig.orientation[0], cameraConfig.orientation[1], cameraConfig.orientation[2]);
+            camera.GetComponent<Camera>().fieldOfView = cameraConfig.vFOV;
+            
+            // streaming setup
+            camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().enabled = cameraConfig.streamingEnabled;
+            camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().streamAddress = cameraConfig.destination;
+            camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().enabled = true;
         }
     }
 
@@ -96,34 +130,13 @@ public class WorldController : MonoBehaviour
         return Quaternion.Euler(-pitch, yaw, -roll);
     }
 
-    public void setUpCamera(Camera camera, int systemId)
-    {
-
-        // find camera settings
-        foreach (var vehicle in configLoader.config.vehicles)
-        {
-            if (vehicle.id == systemId)
-            {
-                foreach (var cameraConfig in vehicle.cameras)
-                {
-                    // TODO fix
-                    if (cameraConfig.id == 1)
-                    {
-                        
-                        camera.transform.position = convertNEDToUnity(cameraConfig.position[0], cameraConfig.position[1], cameraConfig.position[2]);
-                        // read in euler angle orientation and convert to quaternion
-                        camera.transform.rotation = convertEulerNEDToUnity(cameraConfig.orientation[0], cameraConfig.orientation[1], cameraConfig.orientation[2]);
-                        camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().streamAddress = cameraConfig.destination;
-                        camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().enabled = true;
-                    }
-                }
-            }
-        }
-    }
 
 
     private void FixedUpdate()
     {   
-        updateWorldOriginIfNeeded(droneController.latLonAlt.y, droneController.latLonAlt.x, droneController.latLonAlt.z);
+        if (droneController != null)
+        {
+            updateWorldOriginIfNeeded(droneController.latLonAlt.y, droneController.latLonAlt.x, droneController.latLonAlt.z);
+        }
     }
 }

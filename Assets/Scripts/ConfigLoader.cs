@@ -22,6 +22,8 @@ public class CameraConfig
     public int id;
     public float[] position; 
     public float[] orientation;
+    public float vFOV;
+    public bool streamingEnabled;
     public string encoding;
     public string destination;
 }

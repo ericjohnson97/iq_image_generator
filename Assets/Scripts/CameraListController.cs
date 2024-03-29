@@ -8,7 +8,8 @@ public class CameraListController : MonoBehaviour
     public GameObject TextTempate;
     public void CreateEntry( GameObject drone)
     {
-        Camera camera = drone.transform.Find("DynamicCamera").GetComponent<Camera>();
+        // TODO: create a better way to find the cameras
+        Camera camera = drone.transform.Find("DynamicCameraTemplate").GetComponent<Camera>();
         if (camera != null)
         {
             GameObject text = Instantiate(TextTempate, transform);

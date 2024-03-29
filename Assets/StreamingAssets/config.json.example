@@ -6,10 +6,22 @@
             "id" : 1,
             "cameras" : [
                 {
-                    "position" : [0, 0, 0],
+                    "id": 1,
+                    "position" : [3, 0, 0],
                     "orientation" : [0, 0, 0],
+                    "vFOV" : 26,
+                    "streamingEnabled" : "false",
                     "encoding" : "H264Nvidia",
                     "destination" : "udp://192.168.1.255:5600"
+                },
+                {
+                    "id": 2,
+                    "position" : [3, 0, 0],
+                    "orientation" : [0, -90, 0],
+                    "vFOV" : 26,
+                    "streamingEnabled" : "false",
+                    "encoding" : "H264Nvidia",
+                    "destination" : "udp://192.168.1.255:5601"
                 }
             ]
         },
@@ -17,13 +29,17 @@
             "id" : 2,
             "cameras" : [
                 {
-                    "position" : [0, 0, 0],
+                    "id": 1,
+                    "position" : [3, 0, 0],
                     "orientation" : [0, 0, 90],
+                    "vFOV" : 26,
+                    "streamingEnabled" : "false",
                     "encoding" : "H264Nvidia",
-                    "destination" : "udp://192.168.1.255:5601"
+                    "destination" : "udp://192.168.1.255:5610"
                 }
             ]
         }
     ]
+
 }
   

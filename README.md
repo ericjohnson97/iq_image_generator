@@ -29,9 +29,9 @@ This project leverages Cesium for unity to bring geo-specific 3d map tiles into 
 - [x] Use 3d Map tiles to be able to have 3d image generation from any where in the world
 - [x] generate udp h264 video streams from unity cameras
 - [x] support multiple aircraft
-- [ ] create configuration file system to be able to configure
-    - [ ] number of cameras
-    - [ ] camera settings
+- [x] create configuration file system to be able to configure
+    - [x] number of cameras
+    - [x] camera settings
     - [ ] aircraft meshs 
     - [ ] surface deflections and prop rotations
 - [ ] in game menus for configuring settings
@@ -53,6 +53,65 @@ This project leverages Cesium for unity to bring geo-specific 3d map tiles into 
 - configure the `config.json` file in the `Intelligent Quads Image Generator_Data/StreamingAssets` folder
     - set the `"tileURL"`:  to `https://tile.googleapis.com/v1/3dtiles/root.json?key=<your google maps api key>`
     - set the `"mavlink2RestURL"` to a mavlink2rest server. if using inteligentquads.com as the sim backend set it to `"wss://sim.intelligentquads.com/<uuid>"`
+
+### Configuration File
+
+The Image generator loads the file `config.json` from the `Intelligent Quads Image Generator_Data/StreamingAssets` folder. The configuration file is a json file that allows you to configure cameras for each aircraft in the simulation. 
+
+here id an example config file
+
+```json
+{
+    "tileURL": "https://tile.googleapis.com/v1/3dtiles/root.json?key=<YOUR_API_KEY>",
+    "mavlink2RestURL" : "ws://127.0.0.1:6040",
+    "vehicles" : [
+        {
+            "id" : 1,
+            "cameras" : [
+                {
+                    "id": 1,
+                    "position" : [3, 0, 0],
+                    "orientation" : [0, 0, 0],
+                    "vFOV" : 26,
+                    "streamingEnabled" : "false",
+                    "encoding" : "H264Nvidia",
+                    "destination" : "udp://192.168.1.255:5600"
+                },
+                {
+                    "id": 2,
+                    "position" : [3, 0, 0],
+                    "orientation" : [0, -90, 0],
+                    "vFOV" : 26,
+                    "streamingEnabled" : "false",
+                    "encoding" : "H264Nvidia",
+                    "destination" : "udp://192.168.1.255:5601"
+                }
+            ]
+        },
+        {
+            "id" : 2,
+            "cameras" : [
+                {
+                    "id": 1,
+                    "position" : [3, 0, 0],
+                    "orientation" : [0, 0, 90],
+                    "vFOV" : 26,
+                    "streamingEnabled" : "false",
+                    "encoding" : "H264Nvidia",
+                    "destination" : "udp://192.168.1.255:5610"
+                }
+            ]
+        }
+    ]
+
+}
+```
+
+cameras will automatically spawn on aircraft based on the number of cameras in each of the cameras arrays.
+
+**Note**: there does not need to be entry for each aircraft in the simulation. Aircraft are spawned into the world via their mavlink heartbeat. The simulation will automatically spawn an aircraft mesh based on their vehicle type in the heartbeat message. If you would like an aircraft to have a camera attached to it you must add an entry for that aircraft in the `vehicles` array with the associated camera configuration. 
+
+
 
 
 ## FAQ

@@ -11649,12 +11649,12 @@ GameObject:
   - component: {fileID: 397800952}
   - component: {fileID: 397800954}
   m_Layer: 0
-  m_Name: DynamicCamera
+  m_Name: DynamicCameraTemplate
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &397800946
 Transform:
   m_ObjectHideFlags: 0
@@ -11711,7 +11711,7 @@ Camera:
     height: 1
   near clip plane: 0.5
   far clip plane: 50000
-  field of view: 60
+  field of view: 26.991467
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
