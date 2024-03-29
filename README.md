@@ -13,6 +13,11 @@ An image generator is a application that can perform rendering of perspectives i
 
 ![architecture](imgs/IQ-Image-Generator.png)
 
+## Image Generator in Action
+
+[Demo Video 1: Plane and Copter](https://drive.google.com/file/d/1C7zh7yaCywoVYKrR8HzJPFbLfvuoXEst/view?usp=sharing)
+[Demo Video 2: Ardupilot Follow Mode](https://drive.google.com/file/d/179BizkFQe_oQkucMbuEu0llfekSWWDEe/view?usp=sharing)
+
 ## Underlying Technology
 
 This project leverages Cesium for unity to bring geo-specific 3d map tiles into Unity. I have currently elected to use Google Maps as my 3d map tile provider. The map tile provider may be configurable in the future. The project then leverages FFmpeg to create video streams from the Unity cameras. The location of aircraft are brought into Unity using a websocket connection to a mavlink2REST server. 
@@ -111,7 +116,11 @@ cameras will automatically spawn on aircraft based on the number of cameras in e
 
 **Note**: there does not need to be entry for each aircraft in the simulation. Aircraft are spawned into the world via their mavlink heartbeat. The simulation will automatically spawn an aircraft mesh based on their vehicle type in the heartbeat message. If you would like an aircraft to have a camera attached to it you must add an entry for that aircraft in the `vehicles` array with the associated camera configuration. 
 
+### Game Controls
 
+- Use `c` to cycle through follow cameras
+- follow cameras can be repositioned by using `wasd` and scroll wheel
+- press `esc` to bring up menu. **Note** menu is not yet functional
 
 
 ## FAQ
