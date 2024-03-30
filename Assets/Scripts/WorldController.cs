@@ -82,6 +82,21 @@ public class WorldController : MonoBehaviour
             if (droneController == null)
             {
                 droneController = newDrone.GetComponent<DroneController>();
+                // hack since cesium expects exactly one camera name Dynamic camera to be present
+                // find dynamic camera GameObject
+                GameObject dynamicCamera = GameObject.Find("DynamicCamera");
+
+                if (dynamicCamera == null)
+                {
+                    Debug.LogError("DynamicCamera GameObject not found in the scene.");
+                }else{
+                    // Set the DynamicCamera GameObject as a child of the newDrone GameObject.
+                    // This operation modifies the DynamicCamera's transform so that its position, rotation, and scale are now relative to the newDrone.
+                    dynamicCamera.transform.SetParent(newDrone.transform, false);
+
+                }
+
+                
             }
 
             Debug.Log($"Spawned a new drone for system ID: {heartbeat.header.system_id}.");
