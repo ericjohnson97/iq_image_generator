@@ -1,0 +1,47 @@
+version: "3.3"
+services:
+
+  mavlink2rest:
+    image: "ericjohnson97/iq_sim_mavlink2rest:t0.11.19"
+    network_mode: "host"
+    environment:
+      - "MAVLINK_SRC=udpin:127.0.0.1:14551"
+      - "SERVER_PORT=0.0.0.0:6040"
+
+  mavp2p:
+    image: "ericjohnson97/iq_sim_server_mavp2p:latest"
+    network_mode: "host"
+    environment:
+      CMD: "./mavp2p tcpc:127.0.0.1:5760 tcps:0.0.0.0:6000 udpc:127.0.0.1:14550 udpc:192.168.1.230:14550 udpc:127.0.0.1:14551"
+    restart: "on-failure"
+
+  arducopter:
+    image: "ericjohnson97/iq_sim_server_ardupilot:Copter-4.4.0"
+    network_mode: "host"
+    restart: "on-failure"
+    environment:
+      VEHICLE: "Copter"
+      MODEL: "+" 
+      LAT: "30.19913"
+      LON: "-97.67906"
+      ALT: "127"
+      DIR: "357"
+      SYSID: "1"
+    profiles:
+      - "arducopter"
+
+  arduplane:
+    image: "ericjohnson97/iq_sim_server_ardupilot:Plane-4.4.0"
+    network_mode: "host"
+    restart: "on-failure"
+    environment:
+      VEHICLE: "ArduPlane"
+      MODEL: "quadplane"
+      LAT: "30.19913"
+      LON: "-97.67906"
+      ALT: "127"
+      DIR: "357"
+      SYSID: "1"
+    profiles:
+      - "arduplane"
+

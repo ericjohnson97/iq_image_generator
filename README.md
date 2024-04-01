@@ -57,7 +57,8 @@ This project leverages Cesium for unity to bring geo-specific 3d map tiles into 
 - copy the file `config.json.example` to `config.json`
 - configure the `config.json` file in the `Intelligent Quads Image Generator_Data/StreamingAssets` folder
     - set the `"tileURL"`:  to `https://tile.googleapis.com/v1/3dtiles/root.json?key=<your google maps api key>`
-    - set the `"mavlink2RestURL"` to a mavlink2rest server. if using inteligentquads.com as the sim backend set it to `"wss://sim.intelligentquads.com/<uuid>"`
+    - set the `"mavlink2RestURL"` to a mavlink2rest server. if using inteligentquads.com as the sim backend set it to `"wss://sim.intelligentquads.com/<uuid>"` if using the [example simulation](#Example-Simulation) set it to `"ws://127.0.0.1:6040"`
+
 
 ### Configuration File
 
@@ -122,6 +123,18 @@ cameras will automatically spawn on aircraft based on the number of cameras in e
 - follow cameras can be repositioned by using `wasd` and scroll wheel
 - press `esc` to bring up menu. **Note** menu is not yet functional
 
+
+## Example Simulation
+
+This project provides a simulation environments in a docker compose file. There is an environment provided for ArduCopter and ArduPlane. The compose file uses docker compose profiles to allow you to choose which vehicle you want to simulate. The available profiles are  `arducopter` and `arduplane`. You can run a simulation environment by running the following command:
+
+```
+docker-compose -f sim.yml --profile ardusub up
+```
+
+Assuming you have run the `bun run dev --host` command, you can access the simulation environment by opening the browser and accessing `localhost:5173`.
+
+**Note**: I usually run my simulator on a virtual machine with a bridged network adapter. This should work in WSL, but I have not tested it.
 
 ## FAQ
 
