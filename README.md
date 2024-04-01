@@ -129,7 +129,7 @@ cameras will automatically spawn on aircraft based on the number of cameras in e
 This project provides a simulation environments in a docker compose file. There is an environment provided for ArduCopter and ArduPlane. The compose file uses docker compose profiles to allow you to choose which vehicle you want to simulate. The available profiles are  `arducopter` and `arduplane`. You can run a simulation environment by running the following command:
 
 ```
-docker-compose -f sim.yml --profile ardusub up
+docker-compose -f sim.yml --profile arducopter up
 ```
 
 Assuming you have run the `bun run dev --host` command, you can access the simulation environment by opening the browser and accessing `localhost:5173`.
