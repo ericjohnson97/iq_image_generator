@@ -11745,7 +11745,7 @@ MonoBehaviour:
   _height: 1080
   _preset: 1
   _frameRate: 30
-  _streamPreset: 0
+  _streamPreset: 2
   streamAddress: 
 --- !u!1 &477251598
 GameObject:

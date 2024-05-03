@@ -1,51 +1,86 @@
 ﻿using System;
+using System.Threading;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace FFmpegOut.LiveStream
 {
-    /// <summary>
-    /// Represents a session for streaming video from Unity to an RTP endpoint using FFmpeg.
-    /// </summary>
     public sealed class StreamFFmpegSession : FFmpegSession
     {
-        // Defines the format and codec for the raw video data from Unity.
+        private Thread ffmpegThread;
+        private Process ffmpegProcess;
+        private string ffmpegArguments;
+
         private const string UNITY_CAM_TEX_BYTE_FORMAT =
             "-pixel_format rgba -colorspace bt709 -f rawvideo -vcodec rawvideo";
-        // private const string UNITY_CAM_TEX_BYTE_FORMAT =
-        //     "-pixel_format rgba";
-
-        // Sets the FFmpeg logging level to warning.
         private const string FFMPEG_LOGLEVEL = "-loglevel warning";
 
-        // Private constructor to enforce the use of the static Create method.
-        private StreamFFmpegSession(string arguments) : base(arguments) { }
+        private StreamFFmpegSession(string arguments) : base(arguments)
+        {
+            this.ffmpegArguments = arguments;
+        }
 
-        /// <summary>
-        /// Creates a new FFmpeg session for streaming.
-        /// </summary>
-        /// <param name="width">The width of the video.</param>
-        /// <param name="height">The height of the video.</param>
-        /// <param name="frameRate">The frame rate of the video.</param>
-        /// <param name="encodingPreset">The encoding preset to use.</param>
-        /// <param name="streamPreset">The streaming preset to use.</param>
-        /// <param name="address">The address to stream to.</param>
-        /// <returns>A new instance of StreamFFmpegSession.</returns>
         public static StreamFFmpegSession Create(
             int width, int height, float frameRate,
             FFmpegPreset encodingPreset, StreamPreset streamPreset,
             string address)
         {
-            // Constructs the FFmpeg command-line arguments for streaming.
             string ffmpegArguments =
                 $"{UNITY_CAM_TEX_BYTE_FORMAT} {FFMPEG_LOGLEVEL} -framerate {frameRate} -video_size {width}x{height} "
                 + $"-re -i pipe:0 {encodingPreset.GetOptions()} "
                 + $"{streamPreset.GetOptions()} {address}";
-
-            // Logs the constructed FFmpeg arguments for debugging purposes.
-            Debug.Log($"FFmpeg Arguments: {ffmpegArguments}");
-
-            // Returns a new FFmpeg session with the constructed arguments.
+            UnityEngine.Debug.Log($"FFmpeg Arguments: {ffmpegArguments}");
             return new StreamFFmpegSession(ffmpegArguments);
+        }
+
+        public void Start()
+        {
+            if (ffmpegThread == null || !ffmpegThread.IsAlive)
+            {
+                ffmpegThread = new Thread(ExecuteFFmpeg);
+                ffmpegThread.IsBackground = true;
+                ffmpegThread.Start();
+            }
+        }
+
+        private void ExecuteFFmpeg()
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo("ffmpeg", ffmpegArguments)
+            {
+                UseShellExecute = false,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            ffmpegProcess = new Process { StartInfo = startInfo };
+            ffmpegProcess.Start();
+
+            ffmpegProcess.BeginOutputReadLine();
+            ffmpegProcess.BeginErrorReadLine();
+            ffmpegProcess.OutputDataReceived += (sender, args) => UnityEngine.Debug.Log("FFmpeg output: " + args.Data);
+            ffmpegProcess.ErrorDataReceived += (sender, args) => UnityEngine.Debug.Log("FFmpeg error: " + args.Data);
+        }
+
+        public void Stop()
+        {
+            if (ffmpegProcess != null)
+            {
+                if (!ffmpegProcess.HasExited)
+                {
+                    ffmpegProcess.Kill();
+                }
+                ffmpegProcess.Dispose();
+            }
+            if (ffmpegThread != null)
+            {
+                if (ffmpegThread.IsAlive)
+                {
+                    ffmpegThread.Join();  // Wait for the thread to finish
+                }
+                ffmpegThread = null;
+            }
         }
     }
 }
