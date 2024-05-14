@@ -170,6 +170,7 @@ GameObject:
   - component: {fileID: 110319848}
   - component: {fileID: 110319849}
   - component: {fileID: 110319850}
+  - component: {fileID: 110319851}
   m_Layer: 0
   m_Name: IGcontroller
   m_TagString: Untagged
@@ -11041,6 +11042,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameras: []
+--- !u!114 &110319851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110319842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45d4fc40122054c4b9d035bf9999e32f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  port: 12345
 --- !u!1 &134658867
 GameObject:
   m_ObjectHideFlags: 0
