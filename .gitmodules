@@ -1,0 +1,3 @@
+[submodule "Packages/com.cesium.unity"]
+	path = Packages/com.cesium.unity
+	url = git@github.com:ericjohnson97/cesium-unity.git
