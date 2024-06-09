@@ -6,7 +6,7 @@ public class WorldController : MonoBehaviour
 {
     public CesiumForUnity.CesiumGeoreference georeference;
 
-    public DroneController droneController;
+    public bool isDynamicCameraSpawned = false;
 
     public GameObject droneTemplate;
     
@@ -18,52 +18,118 @@ public class WorldController : MonoBehaviour
 
     public ConfigLoader configLoader;
 
-    private void updateWorldOriginIfNeeded(double newLongitude, double newLatitude, double newAltitude)
+    private void Start()
     {
-        double3 newPositionECEF = CesiumForUnity.CesiumWgs84Ellipsoid.LongitudeLatitudeHeightToEarthCenteredEarthFixed(new double3(newLongitude, newLatitude, newAltitude));
-        double distance = math.distance(currentOriginECEF, newPositionECEF);
-
-        if (distance > 100000)
-        {
-            georeference.SetOriginLongitudeLatitudeHeight(newLongitude, newLatitude, newAltitude);
-            currentOriginECEF = newPositionECEF;
-            Debug.Log("World origin updated to drone's current location.");
-        }
+        configLoader.worldController = this;
     }
 
+// mavlink spawning of drone
     public void SpawnDrone(MavlinkMessages.Heartbeat heartbeat)
     {
         Debug.Log($"Spawned a new drone ");
-        // Optionally use systemId to customize the drone or its initialization
+        if (heartbeat.message.mavtype.type != "MAV_TYPE_FIXED_WING" && heartbeat.message.mavtype.type != "MAV_TYPE_QUADROTOR")
+        {
+            Debug.Log("Unsupported drone type. " + heartbeat.message.mavtype.type);
+            return;
+        }
         if (droneTemplate != null)
         {
-            if (heartbeat.message.mavtype.type != "MAV_TYPE_FIXED_WING" && heartbeat.message.mavtype.type != "MAV_TYPE_QUADROTOR")
-            {
-                Debug.Log("Unsupported drone type. " + heartbeat.message.mavtype.type);
-                return;
-            }
-            
             // Instantiate the drone at the position and rotation of the georeference
             GameObject newDrone = Instantiate(droneTemplate, georeference.transform.position, Quaternion.identity, georeference.transform); // Parent set here
 
             // Rename the drone object
             newDrone.name = $"Drone_{heartbeat.header.system_id}";
+            var droneController = newDrone.GetComponent<DroneController>();
+            droneController.systemId = heartbeat.header.system_id;
+            droneController.georeference = georeference;
+            droneController.mavlinkMessageProcessor = mavlinkMessageProcessor;
+            droneController.drone = newDrone;
+            droneController.enabled = true;
+            newDrone.SetActive(true);
+            
+            // Hack to make sure there is only one Camera Named Dynamic Camera Active
+            if (isDynamicCameraSpawned == false)
+            {
+                isDynamicCameraSpawned = true;
+                GameObject dynamicCamera = GameObject.Find("DynamicCamera");
 
-            newDrone.GetComponent<DroneController>().systemId = heartbeat.header.system_id;
-            newDrone.GetComponent<DroneController>().georeference = georeference;
-            newDrone.GetComponent<DroneController>().mavlinkMessageProcessor = mavlinkMessageProcessor;
-            newDrone.GetComponent<DroneController>().drone = newDrone;
-            newDrone.GetComponent<DroneController>().enabled = true;
+                if (dynamicCamera == null)
+                {
+                    Debug.LogError("DynamicCamera GameObject not found in the scene.");
+                }
+                else
+                {
+                    dynamicCamera.transform.SetParent(newDrone.transform, false);
+                }
+            }
+
+            CommonSpawnDrone(heartbeat.header.system_id, newDrone);
+        }
+    }
+
+// JSB spawning code
+    public void SpawnDrone(int id, string type, int port)
+    {
+        if (type != "MAV_TYPE_FIXED_WING" && type != "MAV_TYPE_QUADROTOR")
+        {
+            Debug.Log("Unsupported drone type. " + type);
+            return;
+        }
+        if (droneTemplate != null)
+        {
+            // Instantiate the drone at the position and rotation of the georeference
+            GameObject newDrone = Instantiate(droneTemplate, georeference.transform.position, Quaternion.identity, georeference.transform); // Parent set here
+
+            // Rename the drone object
+            newDrone.name = $"Drone_{id}";
+            var droneController = newDrone.GetComponent<JSBSimDroneController>();
+            droneController.systemId = id;
+            droneController.georeference = georeference;
+            droneController.drone = newDrone;
+            droneController.enabled = true;
+            droneController.UpdateAircraftType(type);
+            Debug.Log("Setting up JSB receiver on port " + port);
+            droneController.setUpJSBReceiver( newDrone.GetComponent<JSBUDPReceiver>(), port);
+            if (id == 1)
+            {
+                droneController.setAsDynamicCameraController();
+            }
+
             newDrone.SetActive(true);
 
-            VehicleConfig vehicleConfig = findVehicleConfig(heartbeat.header.system_id);
+
+            // Hack to make sure there is only one Camera Named Dynamic Camera Active
+            if (isDynamicCameraSpawned == false)
+            {
+                isDynamicCameraSpawned = true;
+                GameObject dynamicCamera = GameObject.Find("DynamicCamera");
+
+                if (dynamicCamera == null)
+                {
+                    Debug.LogError("DynamicCamera GameObject not found in the scene.");
+                }
+                else
+                {
+                    dynamicCamera.transform.SetParent(newDrone.transform, false);
+                }
+            }
+
+
+            CommonSpawnDrone(id, newDrone);
+        }
+    }
+
+    private void CommonSpawnDrone(int systemId, GameObject newDrone )
+    {
+        
+            VehicleConfig vehicleConfig = findVehicleConfig(systemId);
             if (vehicleConfig != null)
             {
                 setUpCameras(vehicleConfig, newDrone);
             }
             else
             {
-                Debug.LogError("Vehicle config not found for system ID: " + heartbeat.header.system_id);
+                Debug.LogError("Vehicle config not found for system ID: " + systemId);
             }
 
             Camera FollowCamera = newDrone.transform.Find("FollowCam").GetComponent<Camera>();
@@ -79,29 +145,10 @@ public class WorldController : MonoBehaviour
 
             cameraListController.CreateEntry(newDrone);
 
-            if (droneController == null)
-            {
-                droneController = newDrone.GetComponent<DroneController>();
-                // hack since cesium expects exactly one camera name Dynamic camera to be present
-                // find dynamic camera GameObject
-                GameObject dynamicCamera = GameObject.Find("DynamicCamera");
-
-                if (dynamicCamera == null)
-                {
-                    Debug.LogError("DynamicCamera GameObject not found in the scene.");
-                }else{
-                    // Set the DynamicCamera GameObject as a child of the newDrone GameObject.
-                    // This operation modifies the DynamicCamera's transform so that its position, rotation, and scale are now relative to the newDrone.
-                    dynamicCamera.transform.SetParent(newDrone.transform, false);
-
-                }
-
-                
-            }
-
-            Debug.Log($"Spawned a new drone for system ID: {heartbeat.header.system_id}.");
-        }
+            Debug.Log($"Spawned a new drone for system ID: {systemId}.");
+        
     }
+
 
     public VehicleConfig findVehicleConfig(int systemId)
     {
@@ -147,11 +194,11 @@ public class WorldController : MonoBehaviour
 
 
 
-    private void FixedUpdate()
-    {   
-        if (droneController != null)
-        {
-            updateWorldOriginIfNeeded(droneController.latLonAlt.y, droneController.latLonAlt.x, droneController.latLonAlt.z);
-        }
-    }
+    // private void FixedUpdate()
+    // {   
+    //     if (droneController != null)
+    //     {
+    //         updateWorldOriginIfNeeded(droneController.latLonAlt.y, droneController.latLonAlt.x, droneController.latLonAlt.z);
+    //     }
+    // }
 }

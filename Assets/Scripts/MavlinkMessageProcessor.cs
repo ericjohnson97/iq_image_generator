@@ -46,6 +46,7 @@ public class MavlinkMessageProcessor : MonoBehaviour
             systemId = newHeartbeat.header.system_id;
             if (heartbeatArray[systemId].header.system_id == -1)
             {
+                Debug.Log($"New drone detected with system ID {systemId}");
                 worldController?.SpawnDrone(newHeartbeat); 
             }
             heartbeatArray[systemId] = newHeartbeat;

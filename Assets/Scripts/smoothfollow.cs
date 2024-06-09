@@ -17,7 +17,7 @@ public class SmoothFollow : MonoBehaviour
 
     // Rotation and zoom speed
     public float rotationSpeed = 100.0f; // Adjust rotation speed as needed
-    public float zoomSpeed = 10.0f; // Adjust zoom speed as needed
+    public float zoomSpeed = 450.0f; // Adjust zoom speed as needed
 
     private void Start()
     {
@@ -30,6 +30,16 @@ public class SmoothFollow : MonoBehaviour
             return;
 
         float ScrollWheelChange = Input.GetAxis("Mouse ScrollWheel");
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            Debug.Log("Shift key is held down");
+            zoomSpeed = 10000.0f;
+        }
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            Debug.Log("Shift key is released");
+            zoomSpeed = 450.0f;
+        }
         if (ScrollWheelChange != 0)
         {
             // Make zoom speed frame rate independent
