@@ -45,6 +45,12 @@ public class WorldController : MonoBehaviour
             droneController.mavlinkMessageProcessor = mavlinkMessageProcessor;
             droneController.drone = newDrone;
             droneController.enabled = true;
+
+            if (heartbeat.header.system_id == 1)
+            {
+                droneController.setAsDynamicCameraController();
+            }
+
             newDrone.SetActive(true);
             
             // Hack to make sure there is only one Camera Named Dynamic Camera Active
