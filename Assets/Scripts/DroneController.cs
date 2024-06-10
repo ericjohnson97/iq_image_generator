@@ -8,6 +8,8 @@ public class DroneController : MonoBehaviour
     public MavlinkMessageProcessor mavlinkMessageProcessor;
     public GameObject drone;
 
+    private bool dynamicCameraController = false;
+
     public int systemId = 1;
     public Vector3 latLonAlt = new Vector3(0, 0, 0);
 
@@ -17,6 +19,26 @@ public class DroneController : MonoBehaviour
     private Vector3 nedPos = new Vector3(0, 0, 0);
 
     private Quaternion lastOrientation = Quaternion.identity;
+
+    private double3 currentOriginECEF = new double3(0, 0, 0);
+
+    public void setAsDynamicCameraController()
+    {
+        dynamicCameraController = true;
+    }
+
+    private void updateWorldOriginIfNeeded(double newLongitude, double newLatitude, double newAltitude)
+    {
+        double3 newPositionECEF = CesiumForUnity.CesiumWgs84Ellipsoid.LongitudeLatitudeHeightToEarthCenteredEarthFixed(new double3(newLongitude, newLatitude, newAltitude));
+        double distance = math.distance(currentOriginECEF, newPositionECEF);
+
+        if (distance > 100000)
+        {
+            georeference.SetOriginLongitudeLatitudeHeight(newLongitude, newLatitude, newAltitude);
+            currentOriginECEF = newPositionECEF;
+            Debug.Log("World origin updated to drone's current location.");
+        }
+    }
 
     private void updatellaPos()
     {
@@ -140,6 +162,12 @@ public class DroneController : MonoBehaviour
 
         // Store the last known orientation
         lastOrientation = drone.transform.rotation;
+
+        if (dynamicCameraController)
+        {
+            // Update the georeference's origin if the drone has moved significantly
+            updateWorldOriginIfNeeded(latLonAlt.y, latLonAlt.x, latLonAlt.z);
+        }
     }
 
 }
