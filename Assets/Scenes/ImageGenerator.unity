@@ -10974,7 +10974,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   georeference: {fileID: 1628688806}
-  droneController: {fileID: 0}
+  isDynamicCameraSpawned: 0
   droneTemplate: {fileID: 200453354}
   mavlinkMessageProcessor: {fileID: 110319845}
   currentOriginECEF:
@@ -11016,6 +11016,7 @@ MonoBehaviour:
     tileURL: 
     mavlink2RestURL: 
     vehicles: []
+  worldController: {fileID: 110319846}
 --- !u!114 &110319849
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11128,6 +11129,8 @@ GameObject:
   m_Component:
   - component: {fileID: 200453355}
   - component: {fileID: 200453357}
+  - component: {fileID: 200453358}
+  - component: {fileID: 200453359}
   m_Layer: 0
   m_Name: drone
   m_TagString: Untagged
@@ -11162,7 +11165,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 200453354}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 74d8ba08a3a6db2479ae04677a87515b, type: 3}
   m_Name: 
@@ -12376,7 +12379,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0.8
+  m_Intensity: 0.5
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -13361,7 +13364,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.5
-  far clip plane: 1000000
+  far clip plane: 30000
   field of view: 60
   orthographic: 0
   orthographic size: 5
