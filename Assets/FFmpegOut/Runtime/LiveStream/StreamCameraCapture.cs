@@ -6,6 +6,7 @@ namespace FFmpegOut.LiveStream
     {
         [SerializeField] public StreamPreset _streamPreset;
         [SerializeField] public string streamAddress;
+        [SerializeField] public bool isGreyScale;
 
         protected override FFmpegSession GetSession(int texWidth, int texHeight)
         {
@@ -15,7 +16,7 @@ namespace FFmpegOut.LiveStream
                 frameRate,
                 preset,
                 _streamPreset,
-                streamAddress);
+                streamAddress, isGreyScale);
         }
     }
 }

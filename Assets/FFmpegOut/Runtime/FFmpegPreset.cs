@@ -72,7 +72,7 @@ namespace FFmpegOut
             switch (preset)
             {
                 // case FFmpegPreset.H264Default:     return "-pix_fmt yuv420p";
-                case FFmpegPreset.MJPEG:           return "-flush_packets 0 -max_delay 5000000";
+                case FFmpegPreset.MJPEG:           return "-flush_packets 0 -max_delay 100000";
                 case FFmpegPreset.H264Default:     return "-c:v libx264 -preset fast -b:v 10M";
                 case FFmpegPreset.H264Nvidia:      return "-c:v h264_nvenc -preset fast -b:v 10M";
                 case FFmpegPreset.H264Lossless420: return "-pix_fmt yuv420p -preset ultrafast -crf 0";

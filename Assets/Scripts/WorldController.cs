@@ -2,6 +2,9 @@ using System;
 using UnityEngine;
 using Unity.Mathematics;
 using System.Collections.Generic;
+using FFmpegOut.LiveStream;
+using FFmpegOut;
+
 public class WorldController : MonoBehaviour
 {
     public CesiumForUnity.CesiumGeoreference georeference;
@@ -182,8 +185,29 @@ public class WorldController : MonoBehaviour
             camera.GetComponent<Camera>().fieldOfView = cameraConfig.vFOV;
             
             // streaming setup
-            camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().enabled = cameraConfig.streamingEnabled;
+            camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().enabled = false;
+            if (Enum.TryParse(cameraConfig.encoding, out FFmpegOut.FFmpegPreset preset))
+            {
+                camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().preset = preset;
+                if( cameraConfig.encoding == "MJPEG")
+                {
+                    Enum.TryParse("UdpMJPEG", out FFmpegOut.LiveStream.StreamPreset streamPreset);
+                    camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>()._streamPreset = streamPreset;
+                }
+            }
+            else
+            {
+                Debug.LogError("Invalid stream encoding value: " + cameraConfig.encoding);
+            }
+
+
+            
             camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().streamAddress = cameraConfig.destination;
+            camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().width = cameraConfig.resolution[0];
+            camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().height = cameraConfig.resolution[1];
+            camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().frameRate = cameraConfig.fps;
+            camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().isGreyScale = cameraConfig.isGreyScale;
+            camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().enabled = cameraConfig.streamingEnabled;
             camera.GetComponent<FFmpegOut.LiveStream.StreamCameraCapture>().enabled = true;
         }
     }

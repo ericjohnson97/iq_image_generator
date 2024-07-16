@@ -25,6 +25,9 @@ public class CameraConfig
     public int id;
     public float[] position; 
     public float[] orientation;
+    public int[] resolution = {1280, 720};
+    public bool isGreyScale = false;
+    public float fps = 15;
     public float vFOV;
     public bool streamingEnabled;
     public string encoding;
