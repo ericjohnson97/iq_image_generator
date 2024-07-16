@@ -25,13 +25,10 @@ public class JSBUDPReceiver : MonoBehaviour
 
         try
         {
-            Debug.Log("Received New FDM Message");
-            // Convert byte array to structure
 
-            // Parse the byte array manually
+            // Parse the byte array
             TempAircraftState.ParseByteArray(bytes);
 
-            Debug.Log("Swapping Endianess");
             // Swap endianess
             TempAircraftState.SwapEndian();
 
@@ -47,17 +44,12 @@ public class JSBUDPReceiver : MonoBehaviour
             // Assign to AircraftState if valid
             AircraftState = TempAircraftState;
 
-            // Log individual values to check for invalid data
-            Debug.Log($"Received: version = {AircraftState.version}");
-            Debug.Log($"Received: latitude = {AircraftState.latitude}");
-            Debug.Log($"Received: longitude = {AircraftState.longitude}");
-
             // Convert latitude and longitude to degrees
             float latitudeInDegrees = (float)(AircraftState.latitude * Mathf.Rad2Deg);
             float longitudeInDegrees = (float)(AircraftState.longitude * Mathf.Rad2Deg);
 
             // Log the final values
-            Debug.Log($"Received: version = {AircraftState.version}, latitude = {latitudeInDegrees}, longitude = {longitudeInDegrees}");
+            // Debug.Log($"Received: version = {AircraftState.version}, latitude = {latitudeInDegrees}, longitude = {longitudeInDegrees}");
         }
         catch (Exception ex)
         {

@@ -110,25 +110,20 @@ public class JSBSimDroneController : MonoBehaviour
         }
     }
 
+    private float FEET2METERS = 0.3048f;
     private void UpdatePosition(FGNetFDM aircraftState)
     {
         // Convert velocities from m/s to Unity units per second and integrate to get position
         Vector3 velocityChange = new Vector3(
-            aircraftState.v_east,
-            -aircraftState.v_down,
-            aircraftState.v_north
+            aircraftState.v_east * FEET2METERS,
+            -aircraftState.v_down * FEET2METERS,
+            aircraftState.v_north * FEET2METERS
         ) * Time.fixedDeltaTime;
-
         Vector3 integratedPosition = drone.transform.position + velocityChange;
 
         // Update NED position
-        Vector3 nedPoslla = new Vector3(
-            (float)aircraftState.longitude * Mathf.Rad2Deg,
-            (float)aircraftState.latitude * Mathf.Rad2Deg,
-            (float)aircraftState.altitude
-        );
 
-        nedPos = ConvertGeoToUnityCoordinates(nedPoslla.x, nedPoslla.y, nedPoslla.z);
+        nedPos = ConvertGeoToUnityCoordinates(aircraftState.longitude * (double)Mathf.Rad2Deg, aircraftState.latitude * (double)Mathf.Rad2Deg, aircraftState.altitude);
 
         // Apply the complementary filter for position
         Vector3 filteredPosition = Vector3.Lerp(integratedPosition, nedPos, 1 - positionAlpha);
