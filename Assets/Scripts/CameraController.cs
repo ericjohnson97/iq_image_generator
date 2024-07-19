@@ -4,7 +4,10 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public List<Camera> cameras = new List<Camera>();
+    public GameObject godModeObject;
     private int currentCameraIndex;
+    private Vector3 lastCameraPosition;
+    private Quaternion lastCameraRotation;
 
     void Start()
     {
@@ -29,6 +32,7 @@ public class CameraController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
+            godModeObject.SetActive(false);
             // Disable the currently enabled camera
             if (currentCameraIndex < cameras.Count && cameras[currentCameraIndex] != null)
             {
@@ -48,6 +52,25 @@ public class CameraController : MonoBehaviour
                 cameras[currentCameraIndex].enabled = true;
                 Debug.Log("Camera with name: " + cameras[currentCameraIndex].name + ", is now rendering.");
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            // Store the last position and rotation of the active camera
+            if (currentCameraIndex < cameras.Count && cameras[currentCameraIndex] != null)
+            {
+                lastCameraPosition = cameras[currentCameraIndex].transform.position;
+                lastCameraRotation = cameras[currentCameraIndex].transform.rotation;
+
+                // Disable the currently enabled camera
+                cameras[currentCameraIndex].enabled = false;
+            }
+
+            // Set god mode object position and rotation to match the last camera's position and rotation
+            godModeObject.transform.position = lastCameraPosition;
+            godModeObject.transform.rotation = lastCameraRotation;
+
+            godModeObject.SetActive(true);
         }
     }
 
