@@ -1,0 +1,9 @@
+image: ${NEXUS_IMAGES_PRIVATE_URL}/devops-tools-base:latest
+
+stages:
+  - success
+
+substitute:
+  stage: success
+  script:
+    - echo "dummy pipeline only needed for repos that have no pipeline configured. this is used to trigger a successful pipeline and meet the requirements to merge"
