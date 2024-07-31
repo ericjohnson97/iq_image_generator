@@ -28,7 +28,7 @@ namespace FFmpegOut.LiveStream
             string colorConversion = "";
             if (isGreyScale)
             {
-                colorConversion = "-vf format=gray ";
+                colorConversion = "-vf format=gray -pix_fmt gray ";
             }
 
             string ffmpegArguments =
