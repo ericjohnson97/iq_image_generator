@@ -21,7 +21,7 @@ public class SmoothFollow : MonoBehaviour
 
     private void Start()
     {
-        offsetPosition = new Vector3(0, 5, -10);
+        offsetPosition = new Vector3(0, 0, -5);
     }
 
     private void LateUpdate()
@@ -66,7 +66,7 @@ public class SmoothFollow : MonoBehaviour
         {
             yRotationOffset = 0;
             xRotationOffset = 0;
-            offsetPosition = new Vector3(0, 5, -10);
+            offsetPosition = new Vector3(0, 0, -5);
         }
 
         // Calculate the current rotation angles
@@ -81,6 +81,7 @@ public class SmoothFollow : MonoBehaviour
 
         // Set the position of the camera on the x-z plane to:
         // distance meters behind the target
+        offsetPosition.z = Mathf.Clamp(offsetPosition.z, -5000f, -1f );
         transform.position = target.position + (currentRotation * offsetPosition);
 
         // Always look at the target
