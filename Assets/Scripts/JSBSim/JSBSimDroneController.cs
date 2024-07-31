@@ -6,7 +6,6 @@ public class JSBSimDroneController : MonoBehaviour
 {
     public CesiumForUnity.CesiumGeoreference georeference;
 
-    private bool dynamicCameraController = false;
     public JSBUDPReceiver jsbUDPReceiver;
     public GameObject drone;
 
@@ -15,12 +14,19 @@ public class JSBSimDroneController : MonoBehaviour
 
     public float alpha = 0.98f;
     public float positionAlpha = 0.98f;
+    public AssetBundleLoader assetBundleLoader;
+    public GameObject defaultModel;
+    
+
+
+    private bool dynamicCameraController = false;
     private string aircraftType = "NONE";
     private Vector3 nedPos = new Vector3(0, 0, 0);
 
     private Quaternion lastOrientation = Quaternion.identity;
 
     private double3 currentOriginECEF = new double3(0, 0, 0);
+
 
 
     public void setUpJSBReceiver(JSBUDPReceiver rec, int connectionPort)
@@ -68,29 +74,26 @@ public class JSBSimDroneController : MonoBehaviour
         nedPos = ConvertGeoToUnityCoordinates(latLonAlt.y, latLonAlt.x, latLonAlt.z);
     }
 
-    // TODO: make the dynamic loading of the aircraft mesh better
-   public void UpdateAircraftType(string type)
+    public void UpdateAircraftType(string modelName)
     {
-
-        // Show the right mesh
-        Transform planeTransform = drone.transform.Find("plane");
-        Transform copterTransform = drone.transform.Find("copter");
-
-        if (planeTransform == null || copterTransform == null)
+        Debug.Log("Loading Model: " + modelName);
+        if (assetBundleLoader.loadedModels.TryGetValue(modelName, out GameObject modelPrefab))
         {
-            Debug.LogError("One of the required GameObjects (plane or copter) is missing in the children of " + drone.name);
-            return;
+            GameObject newModel = Instantiate(modelPrefab);
+
+            if (drone != null)
+            {
+                newModel.transform.SetParent(drone.transform, false);
+                newModel.transform.localPosition = Vector3.zero;
+                newModel.transform.localRotation = Quaternion.identity;
+                defaultModel.SetActive(false);
+            }
+
+            Debug.Log($"Successfully instantiated model: {modelName}");
         }
-
-        if (type == "MAV_TYPE_FIXED_WING")
+        else
         {
-            planeTransform.gameObject.SetActive(true);
-            copterTransform.gameObject.SetActive(false);
-        }
-        else if (type == "MAV_TYPE_QUADROTOR")
-        {
-            copterTransform.gameObject.SetActive(true);
-            planeTransform.gameObject.SetActive(false);
+            Debug.LogError($"Model '{modelName}' not found in loaded models.");
         }
     }
 

@@ -4,10 +4,14 @@ using Unity.Mathematics;
 using System.Collections.Generic;
 using FFmpegOut.LiveStream;
 using FFmpegOut;
+using CesiumForUnity;
 
 public class WorldController : MonoBehaviour
 {
+    public GameObject gameObjectGeoReference;
     public CesiumForUnity.CesiumGeoreference georeference;
+
+    public GameObject defaultModel;
 
     public bool isDynamicCameraSpawned = false;
 
@@ -20,10 +24,47 @@ public class WorldController : MonoBehaviour
     public CameraListController cameraListController;
 
     public ConfigLoader configLoader;
+    public AssetBundleLoader assetBundleLoader;
 
     private void Start()
     {
         configLoader.worldController = this;
+    }
+
+    public void SpawnStaticObject(string objectName, double[] latlonalt, bool clipToGround, float altOffset)
+    {
+        GameObject objInstance = new GameObject();
+        if (assetBundleLoader.loadedModels.TryGetValue(objectName, out GameObject prefab))
+        {
+            // Instantiate the GameObject
+            objInstance = Instantiate(prefab);
+        }
+        else
+        {
+            Debug.LogWarning($"Object '{objectName}' not found in loaded models. Using default model.");
+            if (defaultModel != null)
+            {
+                objInstance = Instantiate(defaultModel);
+                
+            }
+            else
+            {
+                Debug.LogError("Default model is not assigned.");
+            }
+        }
+        objInstance.transform.parent = gameObjectGeoReference.transform;
+
+        // Add Cesium Globe Anchor
+        CesiumGlobeAnchor anchor = objInstance.AddComponent<CesiumGlobeAnchor>();
+        anchor.longitudeLatitudeHeight = new double3(latlonalt[1], latlonalt[0], latlonalt[2]);
+
+        if (clipToGround)
+        {
+            GroundClipping groundClipping = objInstance.AddComponent<GroundClipping>();
+            groundClipping.georeference = georeference;
+            groundClipping.anchor = anchor;
+            groundClipping.altOffset = altOffset;
+        }
     }
 
 // mavlink spawning of drone
@@ -77,13 +118,8 @@ public class WorldController : MonoBehaviour
     }
 
 // JSB spawning code
-    public void SpawnDrone(int id, string type, int port)
+    public void SpawnDrone(int id, string ModelName, int port)
     {
-        if (type != "MAV_TYPE_FIXED_WING" && type != "MAV_TYPE_QUADROTOR")
-        {
-            Debug.Log("Unsupported drone type. " + type);
-            return;
-        }
         if (droneTemplate != null)
         {
             // Instantiate the drone at the position and rotation of the georeference
@@ -96,7 +132,7 @@ public class WorldController : MonoBehaviour
             droneController.georeference = georeference;
             droneController.drone = newDrone;
             droneController.enabled = true;
-            droneController.UpdateAircraftType(type);
+            droneController.UpdateAircraftType(ModelName);
             Debug.Log("Setting up JSB receiver on port " + port);
             droneController.setUpJSBReceiver( newDrone.GetComponent<JSBUDPReceiver>(), port);
             if (id == 1)
