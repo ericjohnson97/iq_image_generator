@@ -29,6 +29,8 @@ public class GodModeCamera : MonoBehaviour
 
     private void Update()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         HandleMovementInput();
         HandleMouseLook();
     }

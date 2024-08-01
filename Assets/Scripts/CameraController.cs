@@ -32,7 +32,12 @@ public class CameraController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            godModeObject.SetActive(false);
+
+            DisableGodModeCamera();
+            // Unlock the cursor and make it visible
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
             // Disable the currently enabled camera
             if (currentCameraIndex < cameras.Count && cameras[currentCameraIndex] != null)
             {
@@ -70,7 +75,7 @@ public class CameraController : MonoBehaviour
             godModeObject.transform.position = lastCameraPosition;
             godModeObject.transform.rotation = lastCameraRotation;
 
-            godModeObject.SetActive(true);
+            EnableGodModeCamera();
         }
     }
 
@@ -85,6 +90,25 @@ public class CameraController : MonoBehaviour
         else
         {
             Debug.LogError("Attempted to add a null camera to the CameraController.");
+        }
+    }
+    private void EnableGodModeCamera()
+    {
+        godModeObject.SetActive(true);
+        GodModeCamera godModeCamera = godModeObject.GetComponent<GodModeCamera>();
+        if (godModeCamera != null)
+        {
+            godModeCamera.enabled = true; // Enable the script
+        }
+    }
+
+    private void DisableGodModeCamera()
+    {
+        godModeObject.SetActive(false);
+        GodModeCamera godModeCamera = godModeObject.GetComponent<GodModeCamera>();
+        if (godModeCamera != null)
+        {
+            godModeCamera.enabled = false; // Disable the script
         }
     }
 }
