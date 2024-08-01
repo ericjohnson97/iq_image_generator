@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.Mathematics;
 using CesiumForUnity;
@@ -10,9 +9,13 @@ public class GroundClipping : MonoBehaviour
     public CesiumGlobeAnchor anchor;
     public float altOffset = 0;
     public float updateInterval = 5f; // Update every 5 seconds
+    public LayerMask groundLayer;
 
     void Start()
     {
+        // Assign groundLayer by layer name
+        groundLayer = LayerMask.GetMask("Ground"); // Replace "Ground" with your actual layer name
+
         StartCoroutine(UpdatePositionRoutine());
     }
 
@@ -30,9 +33,14 @@ public class GroundClipping : MonoBehaviour
                 continue;
             }
 
+            Ray ray = new Ray(transform.position, Vector3.down);
             RaycastHit hit;
-            if (Physics.Raycast(this.transform.position + Vector3.up * 10000f, Vector3.down, out hit, Mathf.Infinity))
+
+
+            // Cast a ray downward and only consider objects in the groundLayer
+            if (Physics.Raycast(this.transform.position + Vector3.up * 10000f, Vector3.down, out hit, Mathf.Infinity, groundLayer))
             {
+                // Process the hit if it is in the ground layer
                 double3 ecef = georeference.TransformUnityPositionToEarthCenteredEarthFixed(
                     new double3(this.transform.position.x, hit.point.y + altOffset, this.transform.position.z));
                 double3 lonLatHeight = CesiumWgs84Ellipsoid.EarthCenteredEarthFixedToLongitudeLatitudeHeight(ecef);
