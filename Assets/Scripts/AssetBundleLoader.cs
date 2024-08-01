@@ -5,63 +5,79 @@ using UnityEngine;
 
 public class AssetBundleLoader : MonoBehaviour
 {
-    public string baseDirectory;  // Base directory where Asset Bundles are stored
     public ConfigLoader configLoader;
     public Dictionary<string, GameObject> loadedModels = new Dictionary<string, GameObject>();
     private List<AssetBundle> loadedAssetBundles = new List<AssetBundle>(); // Track loaded AssetBundles
+    private string baseDirectory = Path.Combine(Application.streamingAssetsPath,"AssetBundles");  // Base directory where Asset Bundles are stored
 
     IEnumerator Start()
     {
-        string[] tagDirectories = Directory.GetDirectories(baseDirectory);
+        bool hasError = false;
 
-        foreach (string tagDirectory in tagDirectories)
+        string[] tagDirectories = null;
+        try
         {
-            string[] bundleFiles = Directory.GetFiles(tagDirectory);
+            tagDirectories = Directory.GetDirectories(baseDirectory);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"An error occurred while accessing directories: {ex.Message}");
+            hasError = true;
+        }
 
-            foreach (string bundleFile in bundleFiles)
+        if (!hasError)
+        {
+            foreach (string tagDirectory in tagDirectories)
             {
-                if (Path.GetExtension(bundleFile) == "" && !bundleFile.EndsWith(".manifest"))
+                string[] bundleFiles = Directory.GetFiles(tagDirectory);
+
+                foreach (string bundleFile in bundleFiles)
                 {
-                    AssetBundleCreateRequest bundleRequest = AssetBundle.LoadFromFileAsync(bundleFile);
-                    yield return bundleRequest;
-
-                    AssetBundle bundle = bundleRequest.assetBundle;
-
-                    if (bundle != null)
+                    if (Path.GetExtension(bundleFile) == "" && !bundleFile.EndsWith(".manifest"))
                     {
-                        // Load all assets from the bundle
-                        AssetBundleRequest assetRequest = bundle.LoadAllAssetsAsync();
-                        yield return assetRequest;
+                        AssetBundleCreateRequest bundleRequest = AssetBundle.LoadFromFileAsync(bundleFile);
+                        yield return bundleRequest;
 
-                        if (assetRequest.allAssets == null)
+                        AssetBundle bundle = bundleRequest.assetBundle;
+
+                        if (bundle != null)
                         {
-                            Debug.LogWarning($"No assets found in AssetBundle '{bundleFile}'.");
-                            continue;
-                        }
+                            // Load all assets from the bundle
+                            AssetBundleRequest assetRequest = bundle.LoadAllAssetsAsync();
+                            yield return assetRequest;
 
-                        foreach (Object asset in assetRequest.allAssets)
+                            if (assetRequest.allAssets == null)
+                            {
+                                Debug.LogWarning($"No assets found in AssetBundle '{bundleFile}'.");
+                                continue;
+                            }
+
+                            foreach (Object asset in assetRequest.allAssets)
+                            {
+                                if (asset is GameObject model)
+                                {
+                                    // Store the loaded model for later use
+                                    loadedModels[model.name] = model;
+                                    Debug.Log($"Successfully loaded model: {model.name}");
+                                }
+                                else
+                                {
+                                    Debug.Log($"Asset '{asset.name}' is not a GameObject, skipping.");
+                                }
+                            }
+
+                            loadedAssetBundles.Add(bundle); // Keep a reference to the loaded bundle
+                        }
+                        else
                         {
-                            if (asset is GameObject model)
-                            {
-                                // Store the loaded model for later use
-                                loadedModels[model.name] = model;
-                                Debug.Log($"Successfully loaded model: {model.name}");
-                            }
-                            else
-                            {
-                                Debug.Log($"Asset '{asset.name}' is not a GameObject, skipping.");
-                            }
+                            Debug.LogError($"Failed to load Asset Bundle from {bundleFile}!");
                         }
-
-                        loadedAssetBundles.Add(bundle); // Keep a reference to the loaded bundle
-                    }
-                    else
-                    {
-                        Debug.LogError($"Failed to load Asset Bundle from {bundleFile}!");
                     }
                 }
             }
         }
+
+        // Ensure configLoader.LoadConfig() is called regardless of errors
         configLoader.LoadConfig();
     }
 
