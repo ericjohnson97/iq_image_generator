@@ -3,6 +3,7 @@
     public enum StreamPreset
     {
         Udp,
+        UdpMJPEG,
         Rtp,
         Rtsp,
         Hls,
@@ -18,6 +19,8 @@
             {
                 case StreamPreset.Udp:
                     return "-f rtp";
+                case StreamPreset.UdpMJPEG:
+                    return "-vcodec mjpeg -q:v 2 -f mjpeg";
                 case StreamPreset.Rtp:
                     return "-f rtp_mpegts";
                 case StreamPreset.Rtsp:
