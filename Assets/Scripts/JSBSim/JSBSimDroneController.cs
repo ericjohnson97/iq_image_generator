@@ -87,6 +87,25 @@ public class JSBSimDroneController : MonoBehaviour
                 newModel.transform.localPosition = Vector3.zero;
                 newModel.transform.localRotation = Quaternion.identity;
                 defaultModel.SetActive(false);
+
+                // Find the child GameObject named "prop" and add the propRPMController component
+                Transform propTransform = newModel.transform.Find("prop");
+                if (propTransform != null)
+                {
+                    propRPMController propController = propTransform.gameObject.AddComponent<propRPMController>();
+                    if (propController != null)
+                    {
+                        Debug.Log("Successfully added propRPMController to prop.");
+                    }
+                    else
+                    {
+                        Debug.LogError("Failed to add propRPMController to prop.");
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Child GameObject 'prop' not found in newModel.");
+                }
             }
 
             Debug.Log($"Successfully instantiated model: {modelName}");
@@ -96,6 +115,7 @@ public class JSBSimDroneController : MonoBehaviour
             Debug.LogError($"Model '{modelName}' not found in loaded models.");
         }
     }
+
 
 
      private void FixedUpdate()
