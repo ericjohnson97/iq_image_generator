@@ -38,7 +38,7 @@ NEXUS_URL2="$NEXUS_URL_BASE/ig_$FILE_FRIENDLY_TAG.zip"
 echo "Uploading $ZIP_FILE to $NEXUS_URL1"
 curl -v -u "$NEXUS_USERNAME:$NEXUS_PASSWORD" --upload-file "$ZIP_FILE" "$NEXUS_URL1" || { echo "Failed to upload $ZIP_FILE to $NEXUS_URL1."; exit 1; }
 
-# echo "Uploading $ZIP_FILE as ig_$FILE_FRIENDLY_TAG.zip to $NEXUS_URL2"
-# curl -v -u "$NEXUS_USERNAME:$NEXUS_PASSWORD" --upload-file "$ZIP_FILE" "$NEXUS_URL2" || { echo "Failed to upload $ZIP_FILE to $NEXUS_URL2."; exit 1; }
+echo "Uploading $ZIP_FILE as ig_$FILE_FRIENDLY_TAG.zip to $NEXUS_URL2"
+curl -v -u "$NEXUS_USERNAME:$NEXUS_PASSWORD" --upload-file "$ZIP_FILE" "$NEXUS_URL2" || { echo "Failed to upload $ZIP_FILE to $NEXUS_URL2."; exit 1; }
 
 echo "Upload completed successfully."
