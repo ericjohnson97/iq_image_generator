@@ -7,6 +7,15 @@ public class Config
     public string tileURL;
     public string mavlink2RestURL;
     public VehicleConfig[] vehicles;
+    public StaticObject[] staticObjects;
+}
+[System.Serializable]
+public class StaticObject
+{
+    public string model = "";
+    public double[] latlonalt = {0,0,0};
+    public bool clipToGround = true;
+    public float altOffset = 0; 
 }
 
 [System.Serializable]
@@ -17,6 +26,7 @@ public class VehicleConfig
     public int port = 12345;
     public int id;
     public CameraConfig[] cameras;
+    public string model = "red drone";
 }
 
 [System.Serializable]
@@ -25,6 +35,9 @@ public class CameraConfig
     public int id;
     public float[] position; 
     public float[] orientation;
+    public int[] resolution = {1280, 720};
+    public bool isGreyScale = false;
+    public float fps = 15;
     public float vFOV;
     public bool streamingEnabled;
     public string encoding;
@@ -40,12 +53,7 @@ public class ConfigLoader : MonoBehaviour
 
     public WorldController worldController;
 
-    private void Start()
-    {
-        LoadConfig();
-    }
-
-    private void LoadConfig()
+    public void LoadConfig()
     {
         string filePath = Path.Combine(Application.streamingAssetsPath, "config.json");
         if (File.Exists(filePath))
@@ -63,28 +71,6 @@ public class ConfigLoader : MonoBehaviour
     }
 
 
-//     {
-//     "tileURL": "https://tile.googleapis.com/v1/3dtiles/root.json?key=AIzaSyCLQrJ7iJvSyCcs5MCQwINWxLrtu9tlnfA",
-//     "mavlink2RestURL" : "wss://sim.intelligentquads.com/60e8797ec8e541c2b50b191c4fda7d9c",
-//     "vehicles" : [
-//         {
-//             "jsbsim" : false
-//             "id" : 1,
-//             "cameras" : [
-//                 {
-//                     "id": 1,
-//                     "position" : [3, 0, 0],
-//                     "orientation" : [0, 0, 0],
-//                     "vFOV" : 26,
-//                     "streamingEnabled" : "false",
-//                     "encoding" : "H264Nvidia",
-//                     "destination" : "udp://127.0.0.1:5600"
-//                 }
-//             ]
-//         }
-//     ]
-
-// }
     private void ApplySettings(Config config)
     {
         // Apply settings to tileset and mavlinkWS as before.
@@ -97,11 +83,19 @@ public class ConfigLoader : MonoBehaviour
             if (vehicleConfig.jsbsim)
             {
                 Debug.Log("JSBSim vehicle detected. config: " + JsonUtility.ToJson(vehicleConfig, true));
-                worldController.SpawnDrone(vehicleConfig.id, vehicleConfig.type, vehicleConfig.port);
+                worldController.SpawnDrone(vehicleConfig.id, vehicleConfig.model, vehicleConfig.port);
             }
             
 
 
         }   
+
+        for (int i = 0; i < config.staticObjects.Length; i++)
+        {
+            StaticObject staticObject = config.staticObjects[i];
+            
+            worldController.SpawnStaticObject(staticObject.model, staticObject.latlonalt, staticObject.clipToGround, staticObject.altOffset);
+            
+        }
     }
 }

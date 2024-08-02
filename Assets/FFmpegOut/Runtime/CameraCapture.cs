@@ -3,6 +3,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Threading.Tasks;
 
 namespace FFmpegOut
 {
@@ -61,7 +62,7 @@ namespace FFmpegOut
         
         #region Public members
         
-        protected virtual FFmpegSession GetSession( int texWidth, int texHeight )
+        protected virtual FFmpegSession GetSession(int texWidth, int texHeight)
         {
             return FFmpegSession.Create(
                 gameObject.name,
@@ -88,7 +89,7 @@ namespace FFmpegOut
             if (++_frameDropCount != 10) return;
 
             Debug.LogWarning(
-                "Significant frame droppping was detected. This may introduce " +
+                "Significant frame dropping was detected. This may introduce " +
                 "time instability into output video. Decreasing the recording " +
                 "frame rate is recommended."
             );
@@ -133,10 +134,35 @@ namespace FFmpegOut
         IEnumerator Start()
         {
             // Sync with FFmpeg pipe thread at the end of every frame.
-            for (var eof = new WaitForEndOfFrame();;)
+            for (var eof = new WaitForEndOfFrame(); ;)
             {
                 yield return eof;
-                _session?.CompletePushFrames();
+                if (_session != null)
+                {
+                    // Asynchronously complete push frames
+                    yield return CompletePushFramesCoroutine();
+                }
+            }
+        }
+
+        IEnumerator CompletePushFramesCoroutine()
+        {
+            var task = CompletePushFramesAsync();
+            while (!task.IsCompleted)
+            {
+                yield return null;
+            }
+            if (task.Exception != null)
+            {
+                Debug.LogError(task.Exception);
+            }
+        }
+
+        async Task CompletePushFramesAsync()
+        {
+            if (_session != null)
+            {
+                await _session.CompletePushFramesAsync();
             }
         }
 
@@ -190,12 +216,14 @@ namespace FFmpegOut
                 // Push the current frame twice to FFmpeg. Actually this is not
                 // an efficient way to catch up. We should think about
                 // implementing frame duplication in a more proper way. #fixme
+                // TODO: clean this up
+                // _session.PushFrame(camera.targetTexture); removing I would rather drop a frame than have the same frame show twice
                 _session.PushFrame(camera.targetTexture);
-                _session.PushFrame(camera.targetTexture);
-                _frameCount += 2;
+                _frameCount++;
             }
             else
             {
+                Debug.Log("Dropping Frame");
                 // Show a warning message about the situation.
                 WarnFrameDrop();
 

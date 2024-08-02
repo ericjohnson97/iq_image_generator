@@ -4,6 +4,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FFmpegOut
 {
@@ -39,7 +40,6 @@ namespace FFmpegOut
                 + " -b:v 2M" // Bitrate
                 + " " + outputPath
             );
-
         }
 
         public static FFmpegSession CreateWithArguments(string arguments)
@@ -63,6 +63,11 @@ namespace FFmpegOut
         public void CompletePushFrames()
         {
             _pipe?.SyncFrameData();
+        }
+
+        public async Task CompletePushFramesAsync()
+        {
+            await Task.Run(() => CompletePushFrames());
         }
 
         public void Close()

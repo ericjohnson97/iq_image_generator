@@ -190,6 +190,282 @@ public struct FGNetFDM
         spoilers = SwapBytes(spoilers);
     }
 
+    public void ParseByteArray(byte[] bytes)
+    {
+        
+        int offset = 0;
+
+        this.version = BitConverter.ToUInt32(bytes, offset);
+        offset += sizeof(uint);
+
+        this.padding = BitConverter.ToUInt32(bytes, offset);
+        offset += sizeof(uint);
+
+        this.longitude = BitConverter.ToDouble(bytes, offset);
+        offset += sizeof(double);
+
+        this.latitude = BitConverter.ToDouble(bytes, offset);
+        offset += sizeof(double);
+
+        this.altitude = BitConverter.ToDouble(bytes, offset);
+        offset += sizeof(double);
+
+        this.agl = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.phi = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.theta = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.psi = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.alpha = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.beta = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.phidot = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.thetadot = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.psidot = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.vcas = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.climb_rate = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.v_north = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.v_east = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.v_down = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.v_body_u = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.v_body_v = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.v_body_w = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.A_X_pilot = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.A_Y_pilot = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.A_Z_pilot = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.stall_warning = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.slip_deg = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.num_engines = BitConverter.ToUInt32(bytes, offset);
+        offset += sizeof(uint);
+
+        this.eng_state = new uint[this.num_engines];
+        for (int i = 0; i < this.num_engines; i++)
+        {
+            this.eng_state[i] = BitConverter.ToUInt32(bytes, offset);
+            offset += sizeof(uint);
+        }
+
+        this.rpm = new float[this.num_engines];
+        for (int i = 0; i < this.num_engines; i++)
+        {
+            this.rpm[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.fuel_flow = new float[this.num_engines];
+        for (int i = 0; i < this.num_engines; i++)
+        {
+            this.fuel_flow[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.fuel_px = new float[this.num_engines];
+        for (int i = 0; i < this.num_engines; i++)
+        {
+            this.fuel_px[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.egt = new float[this.num_engines];
+        for (int i = 0; i < this.num_engines; i++)
+        {
+            this.egt[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.cht = new float[this.num_engines];
+        for (int i = 0; i < this.num_engines; i++)
+        {
+            this.cht[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.mp_osi = new float[this.num_engines];
+        for (int i = 0; i < this.num_engines; i++)
+        {
+            this.mp_osi[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.tit = new float[this.num_engines];
+        for (int i = 0; i < this.num_engines; i++)
+        {
+            this.tit[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.oil_temp = new float[this.num_engines];
+        for (int i = 0; i < this.num_engines; i++)
+        {
+            this.oil_temp[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.oil_px = new float[this.num_engines];
+        for (int i = 0; i < this.num_engines; i++)
+        {
+            this.oil_px[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.num_tanks = BitConverter.ToUInt32(bytes, offset);
+        offset += sizeof(uint);
+
+        this.fuel_quantity = new float[this.num_tanks];
+        for (int i = 0; i < this.num_tanks; i++)
+        {
+            this.fuel_quantity[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.tank_selected = new uint[this.num_tanks];
+        for (int i = 0; i < this.num_tanks; i++)
+        {
+            this.tank_selected[i] = BitConverter.ToUInt32(bytes, offset);
+            offset += sizeof(uint);
+        }
+
+        this.capacity_m3 = new double[this.num_tanks];
+        for (int i = 0; i < this.num_tanks; i++)
+        {
+            this.capacity_m3[i] = BitConverter.ToDouble(bytes, offset);
+            offset += sizeof(double);
+        }
+
+        this.unusable_m3 = new double[this.num_tanks];
+        for (int i = 0; i < this.num_tanks; i++)
+        {
+            this.unusable_m3[i] = BitConverter.ToDouble(bytes, offset);
+            offset += sizeof(double);
+        }
+
+        this.density_kgpm3 = new double[this.num_tanks];
+        for (int i = 0; i < this.num_tanks; i++)
+        {
+            this.density_kgpm3[i] = BitConverter.ToDouble(bytes, offset);
+            offset += sizeof(double);
+        }
+
+        this.level_m3 = new double[this.num_tanks];
+        for (int i = 0; i < this.num_tanks; i++)
+        {
+            this.level_m3[i] = BitConverter.ToDouble(bytes, offset);
+            offset += sizeof(double);
+        }
+
+        this.num_wheels = BitConverter.ToUInt32(bytes, offset);
+        offset += sizeof(uint);
+
+        this.wow = new uint[this.num_wheels];
+        for (int i = 0; i < this.num_wheels; i++)
+        {
+            this.wow[i] = BitConverter.ToUInt32(bytes, offset);
+            offset += sizeof(uint);
+        }
+
+        this.gear_pos = new float[this.num_wheels];
+        for (int i = 0; i < this.num_wheels; i++)
+        {
+            this.gear_pos[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.gear_steer = new float[this.num_wheels];
+        for (int i = 0; i < this.num_wheels; i++)
+        {
+            this.gear_steer[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.gear_compression = new float[this.num_wheels];
+        for (int i = 0; i < this.num_wheels; i++)
+        {
+            this.gear_compression[i] = BitConverter.ToSingle(bytes, offset);
+            offset += sizeof(float);
+        }
+
+        this.cur_time = BitConverter.ToUInt32(bytes, offset);
+        offset += sizeof(uint);
+
+        this.warp = BitConverter.ToInt32(bytes, offset);
+        offset += sizeof(int);
+
+        this.visibility = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.elevator = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.elevator_trim_tab = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.left_flap = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.right_flap = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.left_aileron = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.right_aileron = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.rudder = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.nose_wheel = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.speedbrake = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+        this.spoilers = BitConverter.ToSingle(bytes, offset);
+        offset += sizeof(float);
+
+    }
+
     private uint SwapBytes(uint x)
     {
         return (x << 24) |

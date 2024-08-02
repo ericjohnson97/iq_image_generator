@@ -136,6 +136,66 @@ Assuming you have run the `bun run dev --host` command, you can access the simul
 
 **Note**: I usually run my simulator on a virtual machine with a bridged network adapter. This should work in WSL, but I have not tested it.
 
+## Developer Setup
+
+### Linux
+
+- clone unity project 
+- run 
+```bash
+git submodule update --init --recursive
+```
+
+**Install dependancies and build Cesium-unity**
+These instructions are based on this document 
+https://github.com/CesiumGS/cesium-unity/blob/main/Documentation~/developer-setup.md
+
+I am using the following packages and versions for ubuntu 22.04
+- cmake 3.29.3
+- dotnet-sdk 8.0
+- nasm 2.15.05
+
+**Before you open the unity project for the first time** run the following
+```
+cd Packages/com.cesium.unity/
+dotnet publish Reinterop~ -o .
+```
+
+Then open the project in Unity. After the porject has been opened you should see this error
+```
+DllNotFoundException: CesiumForUnityNative assembly:<unknown assembly> type:<unknown type> member:(null)
+NotImplementedException: The native implementation is missing so OnValidate cannot be invoked.
+```
+
+Now we must build unity-native
+```
+cd Packages/com.cesium.unity/native~
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j14 --target install --config Debug
+
+```
+The `-j14` tells CMake to build using 14 threads. A higher or lower number may be more suitable for your system.
+
+Once this build/install completes, Cesium for Unity should work the next time Unity loads Cesium for Unity. You can get it to do so by either restarting the Editor, or by making a small change to any Cesium for Unity script (.cs) file in `Packages/com.cesium.unity/Runtime`
+
+**Building and Running Game**
+
+When you build and run a standalone game (i.e. with File -> Build Settings... or File -> Build and Run in the Unity Editor), Unity will automatically compile Cesium for Unity for the target platform. Then, by hooking into Unity build events, Cesium for Unity will build the corresponding native code for that platform by running CMake on the command-line. This can take a few minutes, and during that time Unity's progress bar will display a message stating the location of the build log file.
+
+You can view progress by running the following
+
+Replace build-Standalone with the name of the log file from the progress window.
+
+Or on Linux or macOS:
+```
+cd cesium-unity-samples/Packages/com.cesium.unity
+tail -f native~/build-Standalone/build.log
+```
+
+## Windows
+
+
+
 ## FAQ
 
 ### Are you planning on making this image generator CIGI compliant?

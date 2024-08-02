@@ -5,6 +5,7 @@ namespace FFmpegOut
 {
     public enum FFmpegPreset
     {
+        MJPEG,
         H264Default,
         H264Nvidia,
         H264Lossless420,
@@ -26,6 +27,7 @@ namespace FFmpegOut
         {
             switch (preset)
             {
+                case FFmpegPreset.MJPEG:           return "MJPEG";
                 case FFmpegPreset.H264Default:     return "H.264 Default (MP4)";
                 case FFmpegPreset.H264Nvidia:      return "H.264 NVIDIA (MP4)";
                 case FFmpegPreset.H264Lossless420: return "H.264 Lossless 420 (MP4)";
@@ -47,6 +49,7 @@ namespace FFmpegOut
         {
             switch (preset)
             {
+                case FFmpegPreset.MJPEG:
                 case FFmpegPreset.H264Default:
                 case FFmpegPreset.H264Nvidia:
                 case FFmpegPreset.H264Lossless420:
@@ -69,8 +72,9 @@ namespace FFmpegOut
             switch (preset)
             {
                 // case FFmpegPreset.H264Default:     return "-pix_fmt yuv420p";
-                case FFmpegPreset.H264Default:     return "-c:v libx264 -preset fast -tune zerolatency -b:v 10M";
-                case FFmpegPreset.H264Nvidia:      return "-c:v h264_nvenc -preset fast  -b:v 10M";
+                case FFmpegPreset.MJPEG:           return "-flush_packets 0 -max_delay 100000";
+                case FFmpegPreset.H264Default:     return "-c:v libx264 -preset fast -b:v 10M";
+                case FFmpegPreset.H264Nvidia:      return "-c:v h264_nvenc -preset fast -b:v 10M";
                 case FFmpegPreset.H264Lossless420: return "-pix_fmt yuv420p -preset ultrafast -crf 0";
                 case FFmpegPreset.H264Lossless444: return "-pix_fmt yuv444p -preset ultrafast -crf 0";
                 case FFmpegPreset.HevcDefault:     return "-c:v libx265 -pix_fmt yuv420p";
