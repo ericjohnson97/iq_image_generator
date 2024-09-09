@@ -30,8 +30,11 @@ build:
   before_script:
     - ./.gitlab/before_script.sh
   script:
+    - apt update && apt install cmake dotnet-sdk-8.0 nasm
+    - cd Packages/com.cesium.unity/ && dotnet publish Reinterop~ -o .
+    - cd native~/ && cmake -B build -S . -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build build -j14 --target install --config Debug
     -  ./.gitlab/build.sh
-    - ls
   artifacts:
     paths:
       - $UNITY_DIR/Builds/
