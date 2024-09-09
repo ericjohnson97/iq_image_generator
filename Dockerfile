@@ -1,0 +1,1 @@
+FROM unityci/editor:ubuntu-2022.3.20f1-linux-il2cpp-3.1.0
