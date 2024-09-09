@@ -1,9 +1,39 @@
-image: ${NEXUS_IMAGES_PRIVATE_URL}/devops-tools-base:latest
+variables:
+  BUILD_NAME: "Darkhive Image Generator"
+  UNITY_DIR: $CI_PROJECT_DIR 
+  VERSION_NUMBER_VAR: $CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID-$CI_JOB_ID
+  VERSION_BUILD_VAR: $CI_PIPELINE_IID
 
 stages:
-  - success
+  - build
 
-substitute:
-  stage: success
+.default-rules:
+  rules:
+    # Run on push only if it's the default branch
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    # Run for merge request events
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    # Run for manual web-triggered pipelines
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    # Run for scheduled pipelines, only if the schedule name matches the job name
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $SCHEDULE =~ $CI_JOB_NAME'
+    # Don't run for non-default branch pushes
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH'
+      when: never
+
+build:
+  image: $NEXUS_IMAGES_PROXY_URL/unityci/editor:ubuntu-2022.3.20f1-linux-il2cpp-3.1.0
+  stage: build
+  extends: .default-rules
+  variables:
+    BUILD_TARGET: StandaloneLinux64
+  before_script:
+    - chmod +x ./ci/before_script.sh && ./ci/before_script.sh
   script:
-    - echo "dummy pipeline only needed for repos that have no pipeline configured. this is used to trigger a successful pipeline and meet the requirements to merge"
+    -  ./.gitlab/build.sh
+    - ls
+  artifacts:
+    paths:
+      - $UNITY_DIR/Builds/
+  tags:
+    - dh-k8s-f32
