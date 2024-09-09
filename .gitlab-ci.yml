@@ -28,7 +28,7 @@ build:
   variables:
     BUILD_TARGET: StandaloneLinux64
   before_script:
-    - chmod +x ./ci/before_script.sh && ./ci/before_script.sh
+    - ./.gitlab/before_script.sh
   script:
     -  ./.gitlab/build.sh
     - ls
